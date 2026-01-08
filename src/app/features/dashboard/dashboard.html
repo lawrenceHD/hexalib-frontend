@@ -1,0 +1,332 @@
+<div class="dashboard-wrapper">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <span class="logo-icon">📚</span>
+        <span class="logo-text">Hexalib</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-menu">
+      <div class="menu-section">
+        <span class="menu-label">MENU</span>
+        <a [routerLink]="['/dashboard']" routerLinkActive="active" [routerLinkActiveOptions]="{exact: true}" class="menu-item">
+          <i class="icon">📊</i>
+          <span>Dashboard</span>
+        </a>
+        <a [routerLink]="['/categories']" routerLinkActive="active" class="menu-item">
+          <i class="icon">📂</i>
+          <span>Catégories</span>
+        </a>
+        <a class="menu-item disabled">
+          <i class="icon">📖</i>
+          <span>Livres</span>
+          <span class="badge-soon">Bientôt</span>
+        </a>
+        <a class="menu-item disabled">
+          <i class="icon">👥</i>
+          <span>Clients</span>
+          <span class="badge-soon">Bientôt</span>
+        </a>
+      </div>
+
+      <div class="menu-section" *ngIf="currentUser?.role === 'ADMIN'">
+        <span class="menu-label">FINANCIER</span>
+        <a class="menu-item disabled">
+          <i class="icon">💰</i>
+          <span>Transactions</span>
+          <span class="badge-soon">Bientôt</span>
+        </a>
+        <a class="menu-item disabled">
+          <i class="icon">🧾</i>
+          <span>Factures</span>
+          <span class="badge-soon">Bientôt</span>
+        </a>
+      </div>
+
+      <div class="menu-section">
+        <span class="menu-label">OUTILS</span>
+        <a class="menu-item disabled">
+          <i class="icon">⚙️</i>
+          <span>Paramètres</span>
+        </a>
+        <a class="menu-item" (click)="logout()">
+          <i class="icon">🚪</i>
+          <span>Déconnexion</span>
+        </a>
+      </div>
+    </nav>
+
+    <!-- Upgrade Card -->
+    <div class="upgrade-card">
+      <div class="upgrade-icon">⭐</div>
+      <h4>Version Pro</h4>
+      <p>Découvrez les fonctionnalités avancées</p>
+      <button class="btn-upgrade">Bientôt disponible</button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Header -->
+    <header class="top-header">
+      <div class="header-left">
+        <h1>Rapport de Ventes</h1>
+        <!-- <p class="header-date">{{ today | date:'EEEE, d MMMM yyyy':'':'fr' }}</p> -->
+      </div>
+      <div class="header-right">
+        <button class="btn-icon">
+          <i class="icon">🔍</i>
+        </button>
+        <button class="btn-icon">
+          <i class="icon">🔔</i>
+          <span class="notification-badge">3</span>
+        </button>
+        <div class="user-profile">
+          <img src="https://ui-avatars.com/api/?name={{currentUser?.nomComplet}}&background=667eea&color=fff" alt="Profile">
+          <div class="user-info">
+            <span class="user-name">{{ currentUser?.nomComplet }}</span>
+            <span class="user-role">{{ currentUser?.role === 'ADMIN' ? 'Administrateur' : 'Vendeur' }}</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Stats Cards -->
+    <div class="stats-grid">
+      <!-- Total Sales Card -->
+      <div class="stat-card primary">
+        <div class="stat-header">
+          <div class="stat-icon">
+            <i>💵</i>
+          </div>
+          <span class="stat-badge success">+2.65%</span>
+        </div>
+        <div class="stat-body">
+          <h3>Ventes Totales</h3>
+          <div class="stat-value">
+            <span class="amount">0 XAF</span>
+            <span class="comparison">vs mois dernier</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Total Orders Card -->
+      <div class="stat-card">
+        <div class="stat-header">
+          <div class="stat-icon">
+            <i>📦</i>
+          </div>
+          <span class="stat-badge success">+12.4%</span>
+        </div>
+        <div class="stat-body">
+          <h3>Commandes Totales</h3>
+          <div class="stat-value">
+            <span class="amount">0</span>
+            <span class="comparison">Commandes ce mois</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Visitors Card -->
+      <div class="stat-card">
+        <div class="stat-header">
+          <div class="stat-icon">
+            <i>👥</i>
+          </div>
+          <span class="stat-badge danger">-2.04%</span>
+        </div>
+        <div class="stat-body">
+          <h3>Visiteurs</h3>
+          <div class="stat-value">
+            <span class="amount">0</span>
+            <span class="comparison">Utilisateurs ce mois</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Products Sold Card -->
+      <div class="stat-card">
+        <div class="stat-header">
+          <div class="stat-icon">
+            <i>📚</i>
+          </div>
+          <span class="stat-badge success">+12.1%</span>
+        </div>
+        <div class="stat-body">
+          <h3>Produits Vendus</h3>
+          <div class="stat-value">
+            <span class="amount">0</span>
+            <span class="comparison">Produits ce mois</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Section -->
+    <div class="charts-grid">
+      <!-- Customer Habits Chart -->
+      <div class="chart-card large">
+        <div class="chart-header">
+          <div>
+            <h3>Habitudes Clients</h3>
+            <p class="chart-subtitle">Suivez les habitudes de vos clients</p>
+          </div>
+          <select class="chart-select">
+            <option>Cette année</option>
+            <option>Ce mois</option>
+            <option>Cette semaine</option>
+          </select>
+        </div>
+        <div class="chart-body">
+          <div class="chart-placeholder">
+            <div class="chart-info">
+              <div class="chart-legend">
+                <span class="legend-item">
+                  <span class="legend-dot blue"></span>
+                  Produits vus
+                </span>
+                <span class="legend-item">
+                  <span class="legend-dot purple"></span>
+                  Ventes
+                </span>
+              </div>
+              <div class="chart-stats">
+                <div class="chart-stat">
+                  <span class="stat-dot">●</span>
+                  <span class="stat-number">43,787</span>
+                  <span class="stat-label">Produits</span>
+                </div>
+                <div class="chart-stat">
+                  <span class="stat-dot">●</span>
+                  <span class="stat-number">39,784</span>
+                  <span class="stat-label">Produits</span>
+                </div>
+              </div>
+            </div>
+            <!-- <div class="bar-chart">
+              <div class="bar-group" *ngFor="let month of chartMonths">
+                <div class="bar blue" [style.height.%]="getRandomHeight()"></div>
+                <div class="bar purple" [style.height.%]="getRandomHeight()"></div>
+                <span class="bar-label">{{ month }}</span>
+              </div>
+            </div> -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Product Statistics -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <h3>Statistiques Produits</h3>
+            <p class="chart-subtitle">Suivez vos ventes de produits</p>
+          </div>
+          <select class="chart-select">
+            <option>Aujourd'hui</option>
+            <option>Cette semaine</option>
+            <option>Ce mois</option>
+          </select>
+        </div>
+        <div class="chart-body center">
+          <div class="donut-chart">
+            <svg viewBox="0 0 200 200" class="donut">
+              <circle cx="100" cy="100" r="80" fill="none" stroke="#e5e7eb" stroke-width="30"></circle>
+              <circle cx="100" cy="100" r="80" fill="none" stroke="#667eea" stroke-width="30" 
+                      stroke-dasharray="380 503" transform="rotate(-90 100 100)"></circle>
+              <circle cx="100" cy="100" r="80" fill="none" stroke="#ef4444" stroke-width="30" 
+                      stroke-dasharray="160 503" stroke-dashoffset="-380" transform="rotate(-90 100 100)"></circle>
+            </svg>
+            <div class="donut-center">
+              <span class="donut-value">9,829</span>
+              <span class="donut-label">Ventes Produits</span>
+              <span class="donut-change success">+5.3%</span>
+            </div>
+          </div>
+          <div class="product-list">
+            <div class="product-item">
+              <span class="product-icon">💡</span>
+              <span class="product-name">Électronique</span>
+              <span class="product-value">2,487</span>
+              <span class="product-badge success">+1.8%</span>
+            </div>
+            <div class="product-item">
+              <span class="product-icon">🎮</span>
+              <span class="product-name">Jeux</span>
+              <span class="product-value">1,828</span>
+              <span class="product-badge success">+2.3%</span>
+            </div>
+            <div class="product-item">
+              <span class="product-icon">🪑</span>
+              <span class="product-name">Mobilier</span>
+              <span class="product-value">1,463</span>
+              <span class="product-badge danger">-0.01%</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Customer Growth -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <div>
+            <h3>Croissance Clients</h3>
+            <p class="chart-subtitle">Suivez les clients par localisation</p>
+          </div>
+          <select class="chart-select">
+            <option>Aujourd'hui</option>
+            <option>Cette semaine</option>
+            <option>Ce mois</option>
+          </select>
+        </div>
+        <div class="chart-body center">
+          <div class="bubble-chart">
+            <div class="bubble large" style="left: 40%; top: 30%;">
+              <span class="bubble-value">2,417</span>
+            </div>
+            <div class="bubble medium" style="left: 25%; top: 55%;">
+              <span class="bubble-value">2,281</span>
+            </div>
+            <div class="bubble small" style="left: 60%; top: 50%;">
+              <span class="bubble-value">812</span>
+            </div>
+            <div class="bubble tiny" style="left: 50%; top: 70%;">
+              <span class="bubble-value">287</span>
+            </div>
+          </div>
+          <div class="country-list">
+            <div class="country-item">
+              <span class="country-flag">🇺🇸</span>
+              <div class="country-info">
+                <span class="country-name">États-Unis</span>
+                <span class="country-value">2,417</span>
+              </div>
+            </div>
+            <div class="country-item">
+              <span class="country-flag">🇩🇪</span>
+              <div class="country-info">
+                <span class="country-name">Allemagne</span>
+                <span class="country-value">2,281</span>
+              </div>
+            </div>
+            <div class="country-item">
+              <span class="country-flag">🇦🇺</span>
+              <div class="country-info">
+                <span class="country-name">Australie</span>
+                <span class="country-value">812</span>
+              </div>
+            </div>
+            <div class="country-item">
+              <span class="country-flag">🇫🇷</span>
+              <div class="country-info">
+                <span class="country-name">France</span>
+                <span class="country-value">287</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>

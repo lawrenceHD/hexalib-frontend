@@ -1,0 +1,188 @@
+<div class="categorie-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1>Gestion des Catégories</h1>
+      <p class="text-secondary">{{ totalElements }} catégorie(s) au total</p>
+    </div>
+    <button 
+      *ngIf="authService.isAdmin()"
+      class="btn btn-primary" 
+      (click)="openCreateModal()"
+    >
+      <i class="pi pi-plus"></i>
+      Nouvelle Catégorie
+    </button>
+  </div>
+
+  <!-- Barre de recherche -->
+  <div class="search-bar">
+    <input 
+      type="text" 
+      [(ngModel)]="searchTerm" 
+      (keyup.enter)="onSearch()"
+      placeholder="Rechercher par nom ou code..."
+      class="form-control"
+    />
+    <button class="btn btn-secondary" (click)="onSearch()">
+      <i class="pi pi-search"></i> Rechercher
+    </button>
+  </div>
+
+  <!-- Loader -->
+  <div *ngIf="loading" class="text-center">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- Table -->
+  <div *ngIf="!loading" class="card">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Code</th>
+          <th>Nom</th>
+          <th>Description</th>
+          <th>Statut</th>
+          <th>Date de création</th>
+          <th *ngIf="authService.isAdmin()">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let categorie of categories">
+          <td>
+            <span class="badge badge-secondary">{{ categorie.code }}</span>
+          </td>
+          <td>
+            <strong>{{ categorie.nom }}</strong>
+          </td>
+          <td>
+            <span class="text-secondary">
+              {{ categorie.description || 'Aucune description' }}
+            </span>
+          </td>
+          <td>
+            <span 
+              class="badge"
+              [class.badge-success]="categorie.statut === 'ACTIF'"
+              [class.badge-danger]="categorie.statut === 'INACTIF'"
+            >
+              {{ categorie.statut }}
+            </span>
+          </td>
+          <td>{{ categorie.createdAt | date:'dd/MM/yyyy HH:mm' }}</td>
+          <td *ngIf="authService.isAdmin()">
+            <div class="action-buttons">
+              <button 
+                class="btn btn-sm btn-info" 
+                (click)="openEditModal(categorie)"
+                title="Modifier"
+              >
+                <i class="pi pi-pencil"></i>
+              </button>
+              <button 
+                class="btn btn-sm"
+                [class.btn-warning]="categorie.statut === 'ACTIF'"
+                [class.btn-success]="categorie.statut === 'INACTIF'"
+                (click)="toggleStatut(categorie)"
+                [title]="categorie.statut === 'ACTIF' ? 'Désactiver' : 'Activer'"
+              >
+                <i [class.pi-lock]="categorie.statut === 'ACTIF'" 
+                   [class.pi-unlock]="categorie.statut === 'INACTIF'"
+                   class="pi"></i>
+              </button>
+              <button 
+                class="btn btn-sm btn-danger" 
+                (click)="deleteCategorie(categorie)"
+                title="Supprimer"
+              >
+                <i class="pi pi-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="categories.length === 0">
+          <td [attr.colspan]="authService.isAdmin() ? 6 : 5" class="text-center">
+            Aucune catégorie trouvée
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="totalPages > 1" class="pagination">
+    <button 
+      class="btn btn-sm btn-secondary" 
+      [disabled]="currentPage === 0"
+      (click)="onPageChange(currentPage - 1)"
+    >
+      Précédent
+    </button>
+    
+    <span class="page-info">
+      Page {{ currentPage + 1 }} sur {{ totalPages }}
+    </span>
+    
+    <button 
+      class="btn btn-sm btn-secondary" 
+      [disabled]="currentPage === totalPages - 1"
+      (click)="onPageChange(currentPage + 1)"
+    >
+      Suivant
+    </button>
+  </div>
+</div>
+
+<!-- Modal Créer/Modifier -->
+<div *ngIf="showModal" class="modal-overlay" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2>{{ modalMode === 'create' ? 'Nouvelle Catégorie' : 'Modifier la Catégorie' }}</h2>
+      <button class="btn-close" (click)="closeModal()">&times;</button>
+    </div>
+    
+    <form (ngSubmit)="onSubmit()">
+      <div class="modal-body">
+        <!-- Nom -->
+        <div class="form-group">
+          <label for="nom">Nom *</label>
+          <input 
+            type="text" 
+            id="nom"
+            [(ngModel)]="formData.nom"
+            name="nom"
+            class="form-control"
+            placeholder="Ex: Romans, Informatique..."
+            required
+          />
+        </div>
+
+        <!-- Description -->
+        <div class="form-group">
+          <label for="description">Description</label>
+          <textarea 
+            id="description"
+            [(ngModel)]="formData.description"
+            name="description"
+            class="form-control"
+            rows="3"
+            placeholder="Description de la catégorie (optionnel)"
+          ></textarea>
+        </div>
+
+        <p class="text-small text-secondary">
+          * Le code sera généré automatiquement à partir du nom
+        </p>
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">
+          Annuler
+        </button>
+        <button type="submit" class="btn btn-primary" [disabled]="loading">
+          {{ loading ? 'Enregistrement...' : 'Enregistrer' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
