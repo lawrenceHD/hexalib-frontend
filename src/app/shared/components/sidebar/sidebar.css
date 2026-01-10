@@ -1,0 +1,158 @@
+/* ===== SIDEBAR GLOBALE ===== */
+aside {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.04),
+              0 10px 10px -5px rgba(0, 0, 0, 0.02);
+  border-right: 1px solid #e2e8f0;
+}
+
+/* Transition plus fluide */
+aside {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===== HEADER (Logo) ===== */
+aside .flex.items-center.justify-center.h-14 {
+  background: #ffffff;
+  border-bottom: 1px solid #e2e8f0;
+  position: relative;
+}
+
+aside .flex.items-center.justify-center.h-14::after {
+  content: '';
+  position: absolute;
+  bottom: -1px;
+  left: 10%;
+  right: 10%;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #e2e8f0, transparent);
+}
+
+/* Logo icône + texte */
+aside .w-8.h-8.bg-indigo-500 {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  box-shadow: 0 4px 10px rgba(99, 102, 241, 0.25);
+  transition: all 0.3s ease;
+}
+
+aside:hover .w-8.h-8.bg-indigo-500 {
+  transform: scale(1.08) rotate(3deg);
+}
+
+/* ===== SECTION PROFIL ===== */
+aside .px-5.py-4.border-b {
+  background: rgba(249, 250, 251, 0.6);
+  border-bottom: 1px solid #e5e7eb;
+}
+
+aside .w-9.h-9.bg-indigo-500 {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.3);
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+/* ===== ITEMS DU MENU ===== */
+aside ul.flex.flex-col.py-4.space-y-1 li a {
+  position: relative;
+  overflow: hidden;
+  transition: all 0.25s ease;
+}
+
+aside ul.flex.flex-col.py-4.space-y-1 li a::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to right, #eef2ff, transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -1;
+}
+
+aside ul.flex.flex-col.py-4.space-y-1 li a:hover::before {
+  opacity: 1;
+}
+
+/* Effet bordure gauche animé */
+aside ul.flex.flex-col.py-4.space-y-1 li a {
+  border-left: 4px solid transparent;
+}
+
+aside ul.flex.flex-col.py-4.space-y-1 li a.router-link-active,
+aside ul.flex.flex-col.py-4.space-y-1 li a:hover {
+  border-left-color: #6366f1;
+  background-color: rgba(99, 102, 241, 0.08);
+  color: #4338ca;
+  transform: translateX(2px);
+}
+
+/* Icônes */
+aside svg.w-5.h-5 {
+  transition: all 0.3s ease;
+}
+
+aside a:hover svg {
+  transform: scale(1.15);
+  color: #4f46e5;
+}
+
+/* ===== COLLAPSED MODE (version icônes uniquement) ===== */
+aside.w-20 a {
+  justify-content: center;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+aside.w-20 a span:not(.inline-flex) {
+  display: none;
+}
+
+aside.w-20 a .inline-flex {
+  margin-left: 0;
+}
+
+/* Tooltip au survol en mode collapsé */
+aside.w-20 a {
+  position: relative;
+}
+
+aside.w-20 a:hover::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-left: 12px;
+  background: #1f2937;
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  z-index: 50;
+  opacity: 0;
+  pointer-events: none;
+  animation: tooltipFade 0.2s forwards 0.1s;
+}
+
+@keyframes tooltipFade {
+  to { opacity: 1; }
+}
+
+/* ===== BOUTON DÉCONNEXION ===== */
+aside button.logout-button {
+  margin-top: 1rem;
+  color: #ef4444 !important;
+}
+
+aside button.logout-button:hover {
+  background-color: rgba(239, 68, 68, 0.08) !important;
+  color: #dc2626 !important;
+  border-left-color: #ef4444 !important;
+}
+
+/* Overlay mobile plus doux */
+div.fixed.inset-0.bg-black\/50 {
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(3px);
+}

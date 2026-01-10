@@ -18,6 +18,7 @@
           "builder": "@angular/build:application",
           "options": {
             "browser": "src/main.ts",
+             
             "polyfills": [
   "zone.js"
 ],
@@ -30,7 +31,9 @@
             ],
             "styles": [
               "src/material-theme.scss",
-              "src/styles.css",
+             {
+    "input": "src/styles.css"
+  },
   "node_modules/primeicons/primeicons.css",
   "node_modules/ngx-toastr/toastr.css"
             ]
