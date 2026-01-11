@@ -1,0 +1,387 @@
+<!-- src/app/features/commandes/components/commande-list/commande-list.component.html -->
+
+<div class="p-4 sm:p-6 lg:p-8 min-h-screen bg-gray-50 antialiased">
+  <!-- En-tête -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Gestion des Commandes Fournisseurs</h1>
+    <p class="mt-2 text-sm text-gray-600">{{ totalElements }} commande(s) au total</p>
+  </div>
+
+  <!-- Barre de Recherche + Filtres + Bouton Ajouter -->
+  <div class="mb-6 space-y-4">
+    <!-- Ligne 1: Recherche + Bouton -->
+    <div class="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
+      <div class="flex-1 max-w-lg">
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+          </div>
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            (keyup.enter)="onSearch()"
+            placeholder="Rechercher par numéro ou fournisseur..."
+            class="block w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+          />
+        </div>
+      </div>
+
+      <button
+        (click)="createCommande()"
+        class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg"
+      >
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        Nouvelle Commande
+      </button>
+    </div>
+
+    <!-- Ligne 2: Filtres -->
+    <div class="flex flex-wrap gap-3">
+      <!-- Filtre Fournisseur -->
+      <select
+        [(ngModel)]="selectedFournisseurId"
+        (change)="onFilterChange()"
+        class="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-sm"
+      >
+        <option value="">Tous les fournisseurs</option>
+        <option *ngFor="let fournisseur of fournisseurs" [value]="fournisseur.id">{{ fournisseur.nom }}</option>
+      </select>
+
+      <!-- Filtre Statut -->
+      <select
+        [(ngModel)]="selectedStatut"
+        (change)="onFilterChange()"
+        class="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-sm"
+      >
+        <option value="">Tous les statuts</option>
+        <option value="EN_ATTENTE">En attente</option>
+        <option value="RECUE">Reçue</option>
+        <option value="ANNULEE">Annulée</option>
+      </select>
+
+      <!-- Date début -->
+      <input
+        type="date"
+        [(ngModel)]="dateDebut"
+        (change)="onFilterChange()"
+        placeholder="Date début"
+        class="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-sm"
+      />
+
+      <!-- Date fin -->
+      <input
+        type="date"
+        [(ngModel)]="dateFin"
+        (change)="onFilterChange()"
+        placeholder="Date fin"
+        class="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-sm"
+      />
+
+      <!-- Bouton Reset -->
+      <button
+        (click)="resetFilters()"
+        class="px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors text-sm font-medium"
+      >
+        Réinitialiser
+      </button>
+    </div>
+  </div>
+
+  <!-- Loader -->
+  <div *ngIf="loading" class="flex justify-center items-center py-32">
+    <div class="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 border-t-indigo-600"></div>
+  </div>
+
+  <!-- Tableau -->
+  <div *ngIf="!loading" class="bg-white rounded-2xl shadow-sm overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-max table-auto">
+        <thead class="border-b border-gray-100">
+          <tr>
+            <th class="px-6 py-4 text-left">
+              <p class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-600 opacity-80">
+                N° Commande
+              </p>
+            </th>
+            <th class="px-6 py-4 text-left">
+              <p class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-600 opacity-80">
+                Fournisseur
+              </p>
+            </th>
+            <th class="px-6 py-4 text-left">
+              <p class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-600 opacity-80">
+                Date Commande
+              </p>
+            </th>
+            <th class="px-6 py-4 text-left">
+              <p class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-600 opacity-80">
+                Réception Prévue
+              </p>
+            </th>
+            <th class="px-6 py-4 text-left">
+              <p class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-600 opacity-80">
+                Montant
+              </p>
+            </th>
+            <th class="px-6 py-4 text-left">
+              <p class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-600 opacity-80">
+                Statut
+              </p>
+            </th>
+            <th class="px-6 py-4 text-right">
+              <p class="text-xs font-bold uppercase tracking-wider text-gray-600 opacity-80">Actions</p>
+            </th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          <tr *ngFor="let commande of commandes" class="hover:bg-gray-50 transition-colors">
+            <td class="px-6 py-5">
+              <span class="inline-flex items-center px-3 py-1.5 text-xs font-bold uppercase tracking-wider bg-indigo-100 text-indigo-700 rounded-full">
+                {{ commande.numeroCommande }}
+              </span>
+            </td>
+            <td class="px-6 py-5">
+              <p class="text-sm font-semibold text-gray-900">{{ commande.fournisseur.nom }}</p>
+            </td>
+            <td class="px-6 py-5">
+              <p class="text-sm text-gray-900">{{ commande.dateCommande | date:'dd/MM/yyyy' }}</p>
+            </td>
+            <td class="px-6 py-5">
+              <p class="text-sm text-gray-600">
+                {{ commande.dateReceptionPrevue ? (commande.dateReceptionPrevue | date:'dd/MM/yyyy') : '—' }}
+              </p>
+            </td>
+            <td class="px-6 py-5">
+              <p class="text-sm font-semibold text-gray-900">{{ commande.montantTotal | number:'1.0-0' }} FCFA</p>
+            </td>
+            <td class="px-6 py-5">
+              <div class="w-max">
+                <span [class]="'inline-grid items-center font-bold uppercase whitespace-nowrap select-none py-1.5 px-3 text-xs rounded-xl ' + getStatutClass(commande.statut)">
+                  {{ getStatutLabel(commande.statut) }}
+                </span>
+              </div>
+            </td>
+            <td class="px-6 py-5 text-right">
+              <div class="flex justify-end items-center gap-2">
+                <!-- Voir détails / PDF -->
+                <button
+                  (click)="viewDetails(commande)"
+                  class="p-2.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                  title="Voir détails"
+                >
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                  </svg>
+                </button>
+
+                <!-- Télécharger PDF -->
+                <button
+                  (click)="downloadPdf(commande)"
+                  class="p-2.5 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                  title="Télécharger PDF"
+                >
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                  </svg>
+                </button>
+
+                <!-- Éditer (si EN_ATTENTE) -->
+                <button
+                  *ngIf="commande.statut === 'EN_ATTENTE'"
+                  (click)="editCommande(commande)"
+                  class="p-2.5 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                  title="Modifier"
+                >
+                  <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                  </svg>
+                </button>
+
+                <!-- Recevoir (si EN_ATTENTE) -->
+                <button
+                  *ngIf="commande.statut === 'EN_ATTENTE'"
+                  (click)="openRecevoirModal(commande)"
+                  class="p-2.5 text-green-600 hover:bg-green-50 rounded-lg transition-colors"
+                  title="Recevoir la commande"
+                >
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+                  </svg>
+                </button>
+
+                <!-- Annuler (si EN_ATTENTE) -->
+                <button
+                  *ngIf="commande.statut === 'EN_ATTENTE'"
+                  (click)="openAnnulerModal(commande)"
+                  class="p-2.5 text-orange-600 hover:bg-orange-50 rounded-lg transition-colors"
+                  title="Annuler"
+                >
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                </button>
+
+                <!-- Supprimer (si EN_ATTENTE) -->
+                <button
+                  *ngIf="commande.statut === 'EN_ATTENTE'"
+                  (click)="deleteCommande(commande)"
+                  class="p-2.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  title="Supprimer"
+                >
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Ligne vide -->
+          <tr *ngIf="commandes.length === 0">
+            <td colspan="7" class="px-6 py-16 text-center">
+              <svg class="mx-auto h-16 w-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+              <p class="mt-4 text-lg font-medium text-gray-900">Aucune commande trouvée</p>
+              <p class="mt-2 text-sm text-gray-500">Créez la première commande.</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="totalPages > 1" class="mt-6 flex items-center justify-center">
+    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+      <button
+        [disabled]="currentPage === 0"
+        (click)="onPageChange(currentPage - 1)"
+        class="relative inline-flex items-center px-4 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/>
+        </svg>
+      </button>
+
+      <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+        Page {{ currentPage + 1 }} sur {{ totalPages }}
+      </span>
+
+      <button
+        [disabled]="currentPage === totalPages - 1"
+        (click)="onPageChange(currentPage + 1)"
+        class="relative inline-flex items-center px-4 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+        </svg>
+      </button>
+    </nav>
+  </div>
+</div>
+<!-- Modal Recevoir Commande -->
+<div *ngIf="showRecevoirModal" class="modal-overlay">
+  <div class="modal-container modal-sm">
+    <div class="modal-header">
+      <h3>Recevoir la Commande</h3>
+      <button type="button" (click)="closeRecevoirModal()" class="close-btn">✕</button>
+    </div>
+    
+    <form (ngSubmit)="confirmRecevoir()">
+      <div class="modal-body">
+        <!-- Info commande -->
+        <div *ngIf="selectedCommande" class="current-info">
+          <p class="commande-numero">{{ selectedCommande.numeroCommande }}</p>
+          <p class="fournisseur-nom">Fournisseur: <strong>{{ selectedCommande.fournisseur.nom }}</strong></p>
+          <p class="montant-total">Montant: <strong>{{ selectedCommande.montantTotal | number:'1.0-0' }} FCFA</strong></p>
+        </div>
+
+        <!-- Date de réception -->
+        <div class="form-group">
+          <label>Date de réception <span class="required">*</span></label>
+          <input 
+            type="date" 
+            [(ngModel)]="dateReception" 
+            name="dateReception" 
+            required
+          />
+        </div>
+
+        <!-- Avertissement -->
+        <div class="warning-message">
+          <svg class="warning-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+          <span>Attention : Cette action mettra automatiquement à jour les quantités en stock des livres commandés.</span>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" (click)="closeRecevoirModal()" class="btn-secondary">Annuler</button>
+        <button type="submit" [disabled]="loading || !dateReception" class="btn-success">
+          <svg *ngIf="loading" class="spinner" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          {{ loading ? 'Traitement...' : 'Confirmer la réception' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Modal Annuler Commande -->
+<div *ngIf="showAnnulerModal" class="modal-overlay">
+  <div class="modal-container modal-sm">
+    <div class="modal-header">
+      <h3>Annuler la Commande</h3>
+      <button type="button" (click)="closeAnnulerModal()" class="close-btn">✕</button>
+    </div>
+    
+    <form (ngSubmit)="confirmAnnuler()">
+      <div class="modal-body">
+        <!-- Info commande -->
+        <div *ngIf="selectedCommande" class="current-info">
+          <p class="commande-numero">{{ selectedCommande.numeroCommande }}</p>
+          <p class="fournisseur-nom">Fournisseur: <strong>{{ selectedCommande.fournisseur.nom }}</strong></p>
+        </div>
+
+        <!-- Motif d'annulation -->
+        <div class="form-group">
+          <label>Motif d'annulation <span class="optional">(optionnel)</span></label>
+          <textarea 
+            [(ngModel)]="motifAnnulation" 
+            name="motifAnnulation"
+            rows="4"
+            placeholder="Expliquez la raison de l'annulation..."
+          ></textarea>
+        </div>
+
+        <!-- Avertissement -->
+        <div class="warning-message">
+          <svg class="warning-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+          <span>Attention : Cette action est irréversible. La commande sera marquée comme annulée.</span>
+        </div>
+      </div>
+      
+      <div class="modal-footer">
+        <button type="button" (click)="closeAnnulerModal()" class="btn-secondary">Retour</button>
+        <button type="submit" [disabled]="loading" class="btn-danger">
+          <svg *ngIf="loading" class="spinner" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          {{ loading ? 'Annulation...' : 'Confirmer l\'annulation' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

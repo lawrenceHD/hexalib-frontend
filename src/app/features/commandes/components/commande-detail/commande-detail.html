@@ -1,0 +1,201 @@
+<!-- src/app/features/commandes/components/commande-detail/commande-detail.component.html -->
+
+<div class="p-4 sm:p-6 lg:p-8 min-h-screen bg-gray-50 antialiased">
+  <!-- En-tête avec bouton retour -->
+  <div class="mb-6 flex items-center justify-between">
+    <button
+      (click)="goBack()"
+      class="inline-flex items-center px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+    >
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+      </svg>
+      Retour aux commandes
+    </button>
+
+    <button
+      *ngIf="commande"
+      (click)="downloadPdf()"
+      class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg"
+    >
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+      </svg>
+      Télécharger le PDF
+    </button>
+  </div>
+
+  <!-- Loader -->
+  <div *ngIf="loading" class="flex justify-center items-center py-32">
+    <div class="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 border-t-indigo-600"></div>
+  </div>
+
+  <!-- Contenu principal -->
+  <div *ngIf="!loading && commande" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <!-- Colonne de gauche - Informations de la commande -->
+    <div class="lg:col-span-1 space-y-6">
+      <!-- Carte Informations générales -->
+      <div class="bg-white rounded-2xl shadow-sm p-6">
+        <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
+          <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          Informations
+        </h2>
+
+        <div class="space-y-4">
+          <!-- Numéro de commande -->
+          <div>
+            <p class="text-xs text-gray-500 mb-1">Numéro de commande</p>
+            <p class="text-sm font-bold text-indigo-600">{{ commande.numeroCommande }}</p>
+          </div>
+
+          <!-- Statut -->
+          <div>
+            <p class="text-xs text-gray-500 mb-1">Statut</p>
+            <span [class]="'inline-flex items-center font-bold uppercase text-xs px-3 py-1.5 rounded-xl ' + getStatutClass(commande.statut)">
+              {{ getStatutLabel(commande.statut) }}
+            </span>
+          </div>
+
+          <!-- Date de commande -->
+          <div>
+            <p class="text-xs text-gray-500 mb-1">Date de commande</p>
+            <p class="text-sm font-semibold text-gray-900">{{ commande.dateCommande | date:'dd/MM/yyyy' }}</p>
+          </div>
+
+          <!-- Date de réception prévue -->
+          <div *ngIf="commande.dateReceptionPrevue">
+            <p class="text-xs text-gray-500 mb-1">Réception prévue</p>
+            <p class="text-sm font-semibold text-gray-900">{{ commande.dateReceptionPrevue | date:'dd/MM/yyyy' }}</p>
+          </div>
+
+          <!-- Date de réception réelle -->
+          <div *ngIf="commande.dateReceptionReelle">
+            <p class="text-xs text-gray-500 mb-1">Réception réelle</p>
+            <p class="text-sm font-semibold text-green-600">{{ commande.dateReceptionReelle | date:'dd/MM/yyyy' }}</p>
+          </div>
+
+          <!-- Créé par -->
+          <div *ngIf="commande.createdByName">
+            <p class="text-xs text-gray-500 mb-1">Créé par</p>
+            <p class="text-sm text-gray-900">{{ commande.createdByName }}</p>
+          </div>
+
+          <!-- Montant total -->
+          <div class="pt-4 border-t border-gray-200">
+            <p class="text-xs text-gray-500 mb-1">Montant total</p>
+            <p class="text-2xl font-bold text-indigo-600">{{ commande.montantTotal | number:'1.0-0' }} <span class="text-lg">FCFA</span></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Carte Fournisseur -->
+      <div class="bg-white rounded-2xl shadow-sm p-6">
+        <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
+          <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+          </svg>
+          Fournisseur
+        </h2>
+
+        <div class="space-y-3">
+          <div>
+            <p class="text-sm font-bold text-gray-900">{{ commande.fournisseur.nom }}</p>
+          </div>
+
+          <div *ngIf="commande.fournisseur.contact">
+            <p class="text-xs text-gray-500">Contact</p>
+            <p class="text-sm text-gray-700">{{ commande.fournisseur.contact }}</p>
+          </div>
+
+          <div *ngIf="commande.fournisseur.telephone">
+            <p class="text-xs text-gray-500">Téléphone</p>
+            <p class="text-sm text-gray-700">{{ commande.fournisseur.telephone }}</p>
+          </div>
+
+          <div *ngIf="commande.fournisseur.email">
+            <p class="text-xs text-gray-500">Email</p>
+            <p class="text-sm text-gray-700">{{ commande.fournisseur.email }}</p>
+          </div>
+
+          <div *ngIf="commande.fournisseur.adresse">
+            <p class="text-xs text-gray-500">Adresse</p>
+            <p class="text-sm text-gray-700">{{ commande.fournisseur.adresse }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Carte Articles -->
+      <div class="bg-white rounded-2xl shadow-sm p-6">
+        <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
+          <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+          </svg>
+          Articles ({{ commande.lignes.length }})
+        </h2>
+
+        <div class="space-y-3">
+          <div *ngFor="let ligne of commande.lignes" class="pb-3 border-b border-gray-100 last:border-0 last:pb-0">
+            <div class="flex justify-between items-start mb-2">
+              <div class="flex-1">
+                <p class="text-sm font-semibold text-gray-900">{{ ligne.livreTitre }}</p>
+                <p class="text-xs text-gray-500">Code: {{ ligne.livreCode }}</p>
+              </div>
+              <span class="text-xs font-bold bg-indigo-100 text-indigo-700 px-2 py-1 rounded">
+                × {{ ligne.quantite }}
+              </span>
+            </div>
+            <div class="flex justify-between items-center">
+              <p class="text-xs text-gray-600">{{ ligne.prixAchatUnitaire | number:'1.0-0' }} FCFA</p>
+              <p class="text-sm font-bold text-gray-900">{{ ligne.sousTotal | number:'1.0-0' }} FCFA</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div *ngIf="commande.notes" class="bg-white rounded-2xl shadow-sm p-6">
+        <h2 class="text-lg font-bold text-gray-900 mb-4 flex items-center">
+          <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+          </svg>
+          Notes
+        </h2>
+        <p class="text-sm text-gray-700 whitespace-pre-wrap">{{ commande.notes }}</p>
+      </div>
+    </div>
+
+    <!-- Colonne de droite - Prévisualisation PDF -->
+    <div class="lg:col-span-2">
+      <div class="bg-white rounded-2xl shadow-sm overflow-hidden" style="height: calc(100vh - 200px);">
+        <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-4">
+          <h2 class="text-lg font-bold text-white flex items-center">
+            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            Prévisualisation du bon de commande
+          </h2>
+        </div>
+        
+        <div class="h-full bg-gray-100">
+          <iframe
+            *ngIf="pdfUrl"
+            [src]="pdfUrl"
+            class="w-full h-full"
+            frameborder="0"
+          ></iframe>
+          
+          <div *ngIf="!pdfUrl" class="flex items-center justify-center h-full">
+            <div class="text-center">
+              <svg class="mx-auto h-16 w-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+              <p class="text-gray-500">Chargement de la prévisualisation...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

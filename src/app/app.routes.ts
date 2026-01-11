@@ -29,6 +29,28 @@ export const routes: Routes = [
     canActivate: [authGuard, roleGuard],
     data: { roles: ['ADMIN'] } // Seulement pour les admins
   },
+  {
+    path: 'commandes',
+    canActivate: [authGuard],
+    children: [
+      {
+        path: '',
+        loadComponent: () => import('./features/commandes/components/commande-list/commande-list').then(m => m.CommandeListComponent)
+      },
+      {
+        path: 'nouveau',
+        loadComponent: () => import('./features/commandes/components/commande-form/commande-form').then(m => m.CommandeFormComponent)
+      },
+      {
+        path: ':id',
+        loadComponent: () => import('./features/commandes/components/commande-detail/commande-detail').then(m => m.CommandeDetailComponent)
+      },
+      {
+        path: ':id/modifier',
+        loadComponent: () => import('./features/commandes/components/commande-form/commande-form').then(m => m.CommandeFormComponent)
+      }
+    ]
+  },
   
   { path: '**', redirectTo: '/login' }
 ];
