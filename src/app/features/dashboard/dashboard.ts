@@ -12,7 +12,7 @@ interface StatCard {
   icon: string;
   gradient: string;
   change: string;
-  changeType: 'up' | 'down';
+  changeType: 'up' | 'down'| 'stable';
 }
 
 interface ChartDataPoint {
@@ -132,7 +132,12 @@ export class DashboardComponent implements OnInit {
     this.maxChartValue = values.length > 0 ? Math.max(...values) : 1;
   }
 
-  getBarHeight(value: number): number {
-    return (value / this.maxChartValue) * 100;
-  }
+  // Exemple de méthode pour la hauteur des barres (0-100%)
+getBarHeight(value: number | undefined): number {
+  if (!value || value <= 0) return 5; // hauteur minimale visible
+  
+  // Normalisation simple - à adapter selon tes données réelles
+  const maxValue = Math.max(...(this.chartData?.map(d => Math.max(d.online||0, d.store||0)) || [100]));
+  return Math.min(95, Math.round((value / maxValue) * 95)) || 5;
+}
 }

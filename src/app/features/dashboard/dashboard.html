@@ -1,26 +1,33 @@
 <div class="p-4 sm:p-6 lg:p-8 min-h-screen bg-gray-50 antialiased">
   <!-- En-tête -->
   <div class="mb-8">
-    <h1 class="text-3xl font-bold text-gray-900">Tableau de bord</h1>
-    <p class="mt-2 text-sm text-gray-600">
-      Bienvenue, {{ currentUser?.nomComplet || 'Utilisateur' }} 👋 • {{ today | date:'fullDate' }}
+    <h1 class="text-3xl sm:text-4xl font-bold text-gray-900">Tableau de bord</h1>
+    <p class="mt-2 text-sm sm:text-base text-gray-600">
+      Bienvenue, {{ currentUser?.nomComplet || 'Utilisateur' }} 👋 • 
+      {{ today | date:'EEEE d MMMM yyyy' }}
     </p>
   </div>
 
   <!-- Cartes Statistiques -->
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-    <div *ngFor="let stat of stats" class="bg-white rounded-2xl shadow-sm p-6 hover:shadow-md transition-shadow">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6 mb-8">
+    <div *ngFor="let stat of stats" 
+         class="bg-white rounded-2xl shadow-sm p-5 md:p-6 hover:shadow-md transition-shadow duration-200">
       <div class="flex items-center justify-between">
         <div>
           <p class="text-sm font-medium text-gray-600">{{ stat.subtitle }}</p>
-          <p class="mt-2 text-3xl font-bold text-gray-900">{{ stat.title }}</p>
-          <p class="mt-2 text-sm font-medium"
-             [class.text-green-600]="stat.changeType === 'up'"
-             [class.text-red-600]="stat.changeType === 'down'">
-            {{ stat.change }} vs mois dernier
+          <p class="mt-1.5 text-2xl md:text-3xl font-bold text-gray-900">
+            {{ stat.title }}
           </p>
+         <p class="mt-2 text-sm font-medium"
+   [ngClass]="{
+     'text-green-600': stat.changeType === 'up',
+     'text-red-600': stat.changeType === 'down',
+     'text-gray-500': stat.changeType === 'stable' || !stat.changeType
+   }">
+  {{ stat.change || '—' }} vs mois dernier
+</p>
         </div>
-        <div class="p-4 bg-gradient-to-br {{ stat.gradient }} rounded-xl">
+        <div class="p-4 rounded-xl bg-gradient-to-br {{ stat.gradient || 'from-gray-400 to-gray-600' }}">
           <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="stat.icon"/>
           </svg>
@@ -33,26 +40,9 @@
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
     <!-- Graphique Ventes -->
     <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm p-6">
-      <h2 class="text-lg font-semibold text-gray-900 mb-4">Ventes mensuelles</h2>
-      <div class="h-80">
-        <!-- Ici tu peux intégrer un composant chart (ng2-charts, chart.js, etc.) -->
-        <!-- Exemple simple avec barres CSS pour prototype -->
-        <div class="flex items-end justify-between h-full px-4">
-          <div *ngFor="let data of chartData" class="flex flex-col items-center flex-1">
-            <div class="flex space-x-1">
-              <div 
-                class="w-8 bg-indigo-500 rounded-t-md transition-all duration-500"
-                [style.height.%]="getBarHeight(data.online)"
-              ></div>
-              <div 
-                class="w-8 bg-purple-500 rounded-t-md transition-all duration-500"
-                [style.height.%]="getBarHeight(data.store)"
-              ></div>
-            </div>
-            <p class="mt-4 text-xs text-gray-600">{{ data.month }}</p>
-          </div>
-        </div>
-        <div class="flex justify-center items-center mt-4 space-x-6 text-sm">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6">
+        <h2 class="text-lg font-semibold text-gray-900">Ventes mensuelles</h2>
+        <div class="flex items-center gap-6 mt-3 sm:mt-0 text-sm">
           <div class="flex items-center">
             <div class="w-4 h-4 bg-indigo-500 rounded mr-2"></div>
             <span class="text-gray-700">En ligne</span>
@@ -63,33 +53,68 @@
           </div>
         </div>
       </div>
+
+      <div class="h-72 md:h-80 relative">
+        <!-- Graphique en barres CSS -->
+        <div class="absolute inset-0 flex items-end justify-between px-2 md:px-4 gap-1 md:gap-2">
+          <div *ngFor="let data of chartData; let i = index" 
+               class="flex-1 flex flex-col items-center justify-end">
+            <div class="w-full flex justify-center gap-1 md:gap-2 mb-1">
+              <div 
+                class="w-5 md:w-8 bg-indigo-500 rounded-t transition-all duration-500 ease-out"
+                [style.height.%]="getBarHeight(data.online) || 0">
+              </div>
+              <div 
+                class="w-5 md:w-8 bg-purple-500 rounded-t transition-all duration-500 ease-out"
+                [style.height.%]="getBarHeight(data.store) || 0">
+              </div>
+            </div>
+            <p class="text-xs text-gray-500 mt-2 text-center">
+              {{ data.month }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Lignes de référence (optionnel) -->
+        <div class="absolute inset-0 pointer-events-none">
+          <div class="h-full border-t border-gray-200 opacity-30" style="top: 25%"></div>
+          <div class="h-full border-t border-gray-200 opacity-30" style="top: 50%"></div>
+          <div class="h-full border-t border-gray-200 opacity-30" style="top: 75%"></div>
+        </div>
+      </div>
     </div>
 
     <!-- Activités Récentes -->
     <div class="bg-white rounded-2xl shadow-sm p-6">
-      <h2 class="text-lg font-semibold text-gray-900 mb-4">Activité récente</h2>
-      <div class="space-y-4">
-        <div *ngFor="let activity of recentActivities" class="flex items-start space-x-3">
-          <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 {{ activity.color }}">
+      <h2 class="text-lg font-semibold text-gray-900 mb-5">Activité récente</h2>
+      <div class="space-y-4 max-h-[320px] overflow-y-auto">
+        <div *ngFor="let activity of recentActivities || []" 
+             class="flex items-start gap-3">
+          <div class="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 {{ activity.color || 'bg-gray-400' }}">
             <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
             </svg>
           </div>
-          <div class="flex-1">
-            <p class="text-sm font-medium text-gray-900">{{ activity.title }}</p>
-            <p class="text-xs text-gray-500">{{ activity.subtitle }}</p>
-            <p class="text-xs text-gray-400 mt-1">{{ activity.time }}</p>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-gray-900 truncate">{{ activity.title || 'Activité' }}</p>
+            <p class="text-xs text-gray-500 truncate">{{ activity.subtitle || '' }}</p>
+            <p class="text-xs text-gray-400 mt-1">{{ activity.time || '—' }}</p>
           </div>
         </div>
+
+        <!-- <div *ngIf="!(recentActivities?.length)" class="text-center text-gray-500 py-8">
+          Aucune activité récente pour le moment
+        </div> -->
       </div>
     </div>
   </div>
 
-  <!-- Actions Rapides (optionnel) -->
+  <!-- Actions Rapides -->
   <div class="bg-white rounded-2xl shadow-sm p-6">
-    <h2 class="text-lg font-semibold text-gray-900 mb-4">Actions rapides</h2>
+    <h2 class="text-lg font-semibold text-gray-900 mb-5">Actions rapides</h2>
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-      <button class="flex flex-col items-center p-4 rounded-xl hover:bg-gray-50 transition-colors">
+      <!-- Exemple pour Catégories -->
+      <button class="flex flex-col items-center p-4 rounded-xl hover:bg-gray-50 transition-all duration-200">
         <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-3">
           <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
@@ -97,7 +122,9 @@
         </div>
         <span class="text-sm font-medium text-gray-700">Catégories</span>
       </button>
-      <button class="flex flex-col items-center p-4 rounded-xl hover:bg-gray-50 transition-colors">
+
+      <!-- Exemple pour Livres -->
+      <button class="flex flex-col items-center p-4 rounded-xl hover:bg-gray-50 transition-all duration-200">
         <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-3">
           <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
@@ -105,7 +132,8 @@
         </div>
         <span class="text-sm font-medium text-gray-700">Livres</span>
       </button>
-      <!-- Ajoute les autres selon tes routes -->
+
+      <!-- Ajoute les autres actions ici... -->
     </div>
   </div>
 </div>

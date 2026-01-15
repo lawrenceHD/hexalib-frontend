@@ -18,10 +18,9 @@
           "builder": "@angular/build:application",
           "options": {
             "browser": "src/main.ts",
-             
             "polyfills": [
-  "zone.js"
-],
+              "zone.js"
+            ],
             "tsConfig": "tsconfig.app.json",
             "assets": [
               {
@@ -31,11 +30,14 @@
             ],
             "styles": [
               "src/material-theme.scss",
-             {
-    "input": "src/styles.css"
-  },
-  "node_modules/primeicons/primeicons.css",
-  "node_modules/ngx-toastr/toastr.css"
+              {
+                "input": "src/styles.css"
+              },
+              "node_modules/primeicons/primeicons.css",
+              "node_modules/ngx-toastr/toastr.css"
+            ],
+            "scripts": [
+              "node_modules/assistant-chat-ai/dist/assistant.min.js"
             ]
           },
           "configurations": {
@@ -65,7 +67,8 @@
         "serve": {
           "builder": "@angular/build:dev-server",
           "options": {
-    "proxyConfig": "proxy.conf.json"},
+            "proxyConfig": "proxy.conf.json"
+          },
           "configurations": {
             "production": {
               "buildTarget": "hexalib-frontend:build:production"
