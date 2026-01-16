@@ -39,3 +39,10 @@ body {
     Roboto, sans-serif;
   background-color: #f8fafc;
 }
+button{
+  margin:5px;
+  padding:5px;
+}
+form{
+  margin:10px;
+}

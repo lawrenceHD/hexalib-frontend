@@ -1,6 +1,6 @@
 <!-- src/app/features/commandes/components/commande-list/commande-list.component.html -->
 
-<div class="p-4 sm:p-6 lg:p-8 min-h-screen bg-gray-50 antialiased">
+<div class="p-4 sm:p-6 lg:p-8 min-h-screen bg-gray-50 antialiased" style="margin:5px;padding:5px">
   <!-- En-tête -->
   <div class="mb-8">
     <h1 class="text-3xl font-bold text-gray-900">Gestion des Commandes Fournisseurs</h1>
@@ -8,21 +8,21 @@
   </div>
 
   <!-- Barre de Recherche + Filtres + Bouton Ajouter -->
-  <div class="mb-6 space-y-4">
+  <div class="mb-6 space-y-4" style="margin:5px;padding:5px">
     <!-- Ligne 1: Recherche + Bouton -->
     <div class="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
       <div class="flex-1 max-w-lg">
         <div class="relative">
           <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin:5px;padding:5px">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
             </svg>
           </div>
           <input
-            type="text"
+            type="text" style="margin:5px;padding:5px"
             [(ngModel)]="searchTerm"
             (keyup.enter)="onSearch()"
-            placeholder="Rechercher par numéro ou fournisseur..."
+            placeholder="     Rechercher par numéro ou fournisseur..."
             class="block w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
           />
         </div>
@@ -30,7 +30,7 @@
 
       <button
         (click)="createCommande()"
-        class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-xl hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg"
+        class="inline-flex items-center   bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg"
       >
         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
@@ -38,11 +38,13 @@
         Nouvelle Commande
       </button>
     </div>
+   
+    
 
     <!-- Ligne 2: Filtres -->
-    <div class="flex flex-wrap gap-3">
+    <div class="flex flex-wrap gap-3" style="margin:5px;padding:5px">
       <!-- Filtre Fournisseur -->
-      <select
+      <select style="margin:5px;padding:5px"
         [(ngModel)]="selectedFournisseurId"
         (change)="onFilterChange()"
         class="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-sm"
@@ -52,7 +54,7 @@
       </select>
 
       <!-- Filtre Statut -->
-      <select
+      <select style="margin:5px;padding:5px"
         [(ngModel)]="selectedStatut"
         (change)="onFilterChange()"
         class="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-sm"
@@ -64,7 +66,7 @@
       </select>
 
       <!-- Date début -->
-      <input
+      <input style="margin:5px;padding:5px"
         type="date"
         [(ngModel)]="dateDebut"
         (change)="onFilterChange()"
@@ -73,7 +75,7 @@
       />
 
       <!-- Date fin -->
-      <input
+      <input style="margin:5px;padding:5px"
         type="date"
         [(ngModel)]="dateFin"
         (change)="onFilterChange()"
@@ -97,7 +99,7 @@
   </div>
 
   <!-- Tableau -->
-  <div *ngIf="!loading" class="bg-white rounded-2xl shadow-sm overflow-hidden">
+  <div *ngIf="!loading" class="bg-white rounded-lg shadow-sm overflow-hidden" style="margin:5px;padding:5px">
     <div class="overflow-x-auto">
       <table class="w-full min-w-max table-auto">
         <thead class="border-b border-gray-100">

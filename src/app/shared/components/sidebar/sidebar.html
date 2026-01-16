@@ -39,7 +39,7 @@
   </div>
 
   <!-- Profil utilisateur -->
-  <div class="p-4 border-b border-gray-200">
+  <div class="p-4 border-b border-gray-200" style="margin:5px;padding:5px">
     <div class="flex items-center space-x-3">
       <div class="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-semibold text-lg shrink-0">
         {{ (currentUser?.nomComplet || 'U')?.charAt(0)?.toUpperCase() }}
@@ -56,7 +56,7 @@
   </div>
 
   <!-- Contenu menu -->
-  <div class="flex-1 overflow-y-auto py-4">
+  <div class="flex-1 overflow-y-auto py-4" style="margin:5px;padding:5px">
     <ul class="flex flex-col space-y-1 px-3">
       <li *ngFor="let item of filteredMenuItems">
         <a
