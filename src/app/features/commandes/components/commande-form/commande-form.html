@@ -132,7 +132,8 @@
               Articles de la commande ({{ lignes.length }})
             </h2>
 
-            <button
+            <button 
+            style="padding: 0.75rem 1rem; "
               type="button"
               (click)="openAddLigneModal()"
               class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors"
@@ -155,6 +156,7 @@
                   </p>
                 </div>
                 <button
+                style="padding: 0.75rem 1rem; "
                   type="button"
                   (click)="removeLigne(i)"
                   class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
@@ -171,6 +173,7 @@
                 <div>
                   <label class="block text-xs text-gray-500 mb-1">Quantité</label>
                   <input 
+                  style="padding: 0.75rem 1rem; "
                     type="number"
                     [(ngModel)]="ligne.quantite"
                     [name]="'quantite_' + i"
@@ -184,6 +187,7 @@
                 <div style="margin:10px">
                   <label class="block text-xs text-gray-500 mb-1">Prix unitaire (FCFA)</label>
                   <input
+                  style="padding: 0.75rem 1rem; "
                     type="number"
                     [(ngModel)]="ligne.prixAchatUnitaire"
                     [name]="'prix_' + i"
@@ -197,7 +201,7 @@
                 <!-- Sous-total -->
                 <div style="margin:10px">
                   <label class="block text-xs text-gray-500 mb-1">Sous-total</label>
-                  <div class="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-semibold text-gray-900">
+                  <div class="px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm font-semibold text-gray-900" style="padding: 0.75rem 1rem; ">
                     {{ ligne.sousTotal | number:'1.0-0' }} FCFA
                   </div>
                 </div>
@@ -217,7 +221,8 @@
 
         <!-- Boutons d'action -->
         <div class="mt-6 flex justify-end gap-3">
-          <button
+          <button 
+          style="padding: 0.75rem 1rem; "
             type="button"
             (click)="cancel()"
             class="px-6 py-3 border border-gray-300 rounded-lg bg-white text-gray-700 font-medium hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all"
@@ -225,7 +230,8 @@
             Annuler
           </button>
 
-          <button
+          <button 
+          style="padding: 0.75rem 1rem; "
             type="submit"
             [disabled]="loading || lignes.length === 0"
             class="inline-flex justify-center px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold rounded-lg shadow-md hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
