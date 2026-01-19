@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { environment } from '../../../environments/environment';
 //import { TokenService } from './token.service';
 import { TokenService } from './token';
+import {jwtDecode} from 'jwt-decode';
 import { 
   LoginRequest, 
   LoginResponse, 
@@ -32,6 +33,28 @@ export class AuthService {
       this.currentUserSubject.next(user);
     }
   }
+
+  isAuthenticated(): boolean {
+  const token = this.tokenService.getToken();
+  if (!token) return false;
+
+  try {
+    const decoded: any = jwtDecode(token);
+    const currentTime = Date.now() / 1000; // Temps actuel en secondes
+
+    if (decoded.exp < currentTime) {
+      console.warn('Token expiré');
+      this.logout(); // Déconnexion immédiate
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Token invalide ou malformé', error);
+    this.logout();
+    return false;
+  }
+}
 
   // Login
   login(credentials: LoginRequest): Observable<ApiResponse<LoginResponse>> {

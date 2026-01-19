@@ -10,38 +10,42 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      let errorMessage = 'Une erreur est survenue';
+      let errorMessage = 'Une erreur est survenue. Veuillez réessayer plus tard.';
 
-      if (error.status === 0) {
-        // Erreur réseau
-        errorMessage = 'Impossible de contacter le serveur. Vérifiez votre connexion.';
-      } else if (error.status === 401) {
-        // Non autorisé
-        errorMessage = error.error?.message || 'Email ou mot de passe incorrect';
-        
-        // Si ce n'est pas la route de login, déconnecter
-        if (!req.url.includes('/auth/login')) {
-          tokenService.clear();
-          router.navigate(['/login']);
+      // Gestion des erreurs critiques d'auth
+      if (error.status === 401 || error.status === 403) {
+        errorMessage = error.error?.message || 'Session expirée ou accès refusé.';
+
+        // Déconnexion immédiate + redirection
+        tokenService.clear();
+        router.navigate(['/login'], {
+          queryParams: { returnUrl: router.url }  // Pour revenir où on était
+        });
+      } 
+      else if (error.status === 400) {
+        errorMessage = error.error?.message || 'Données invalides.';
+        if (error.error?.data) {
+          const details = Object.entries(error.error.data)
+            .map(([field, msg]) => `• ${field}: ${msg}`)
+            .join('\n');
+          errorMessage += `\n\nDétails:\n${details}`;
         }
-      } else if (error.status === 403) {
-        // Interdit
-        errorMessage = error.error?.message || 'Accès refusé';
-      } else if (error.status === 404) {
-        // Non trouvé
-        errorMessage = error.error?.message || 'Ressource non trouvée';
-      } else if (error.status === 500) {
-        // Erreur serveur
-        errorMessage = error.error?.message || 'Erreur interne du serveur';
-      } else if (error.error?.message) {
-        // Message du backend
+      } 
+      else if (error.status === 404) {
+        errorMessage = 'Ressource non trouvée.';
+      } 
+      else if (error.status === 500) {
+        errorMessage = 'Erreur interne du serveur. Contactez un administrateur.';
+      } 
+      else if (error.error?.message) {
         errorMessage = error.error.message;
       }
 
-      console.error('HTTP Error:', {
+      console.error('Erreur HTTP interceptée :', {
+        url: req.url,
         status: error.status,
         message: errorMessage,
-        error: error.error
+        detail: error.error
       });
 
       return throwError(() => new Error(errorMessage));
