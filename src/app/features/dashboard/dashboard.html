@@ -1,6 +1,6 @@
 <div class="p-4 sm:p-6 lg:p-8 min-h-screen bg-gray-50 antialiased">
   <!-- En-tête -->
-  <div class="mb-8">
+  <div class="mb-8" style="padding: 0.75rem 1rem; ">
     <h1 class="text-3xl sm:text-4xl font-bold text-gray-900">Tableau de bord</h1>
     <p class="mt-2 text-sm sm:text-base text-gray-600">
       Bienvenue, {{ currentUser?.nomComplet || 'Utilisateur' }} 👋 • 
@@ -9,10 +9,10 @@
   </div>
 
   <!-- Cartes Statistiques -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6 mb-8">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 md:gap-6 mb-8" style="padding: 0.75rem 1rem; ">
     <div *ngFor="let stat of stats" 
          class="bg-white rounded-2xl shadow-sm p-5 md:p-6 hover:shadow-md transition-shadow duration-200">
-      <div class="flex items-center justify-between">
+      <div class="flex items-center justify-between" style="padding: 0.75rem 1rem; ">
         <div>
           <p class="text-sm font-medium text-gray-600">{{ stat.subtitle }}</p>
           <p class="mt-1.5 text-2xl md:text-3xl font-bold text-gray-900">
@@ -37,9 +37,9 @@
   </div>
 
   <!-- Graphique + Activités Récentes -->
-  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8" style="padding: 0.75rem 1rem; ">
     <!-- Graphique Ventes -->
-    <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm p-6">
+    <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm p-6" style="padding: 0.75rem 1rem; ">
       <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-6">
         <h2 class="text-lg font-semibold text-gray-900">Ventes mensuelles</h2>
         <div class="flex items-center gap-6 mt-3 sm:mt-0 text-sm">
@@ -54,9 +54,9 @@
         </div>
       </div>
 
-      <div class="h-72 md:h-80 relative">
+      <div class="h-72 md:h-80 relative" style="padding: 0.75rem 1rem; ">
         <!-- Graphique en barres CSS -->
-        <div class="absolute inset-0 flex items-end justify-between px-2 md:px-4 gap-1 md:gap-2">
+        <div class="absolute inset-0 flex items-end justify-between px-2 md:px-4 gap-1 md:gap-2" style="padding: 0.75rem 1rem; ">
           <div *ngFor="let data of chartData; let i = index" 
                class="flex-1 flex flex-col items-center justify-end">
             <div class="w-full flex justify-center gap-1 md:gap-2 mb-1">
@@ -85,7 +85,7 @@
     </div>
 
     <!-- Activités Récentes -->
-    <div class="bg-white rounded-2xl shadow-sm p-6">
+    <div class="bg-white rounded-2xl shadow-sm p-6" style="padding: 0.75rem 1rem; ">
       <h2 class="text-lg font-semibold text-gray-900 mb-5">Activité récente</h2>
       <div class="space-y-4 max-h-[320px] overflow-y-auto">
         <div *ngFor="let activity of recentActivities || []" 
@@ -110,11 +110,12 @@
   </div>
 
   <!-- Actions Rapides -->
-  <div class="bg-white rounded-2xl shadow-sm p-6">
+ <div style="padding: 0.75rem 1rem; ">
+   <div class="bg-white rounded-2xl shadow-sm p-6" style="padding: 0.75rem 1rem; ">
     <h2 class="text-lg font-semibold text-gray-900 mb-5">Actions rapides</h2>
     <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
       <!-- Exemple pour Catégories -->
-      <button class="flex flex-col items-center p-4 rounded-xl hover:bg-gray-50 transition-all duration-200">
+      <button class="flex flex-col items-center p-4 rounded-xl hover:bg-gray-50 transition-all duration-200" style="padding: 0.75rem 1rem; ">
         <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-3">
           <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
@@ -124,7 +125,7 @@
       </button>
 
       <!-- Exemple pour Livres -->
-      <button class="flex flex-col items-center p-4 rounded-xl hover:bg-gray-50 transition-all duration-200">
+      <button class="flex flex-col items-center p-4 rounded-xl hover:bg-gray-50 transition-all duration-200" style="padding: 0.75rem 1rem; ">
         <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-3">
           <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
@@ -136,4 +137,5 @@
       <!-- Ajoute les autres actions ici... -->
     </div>
   </div>
+ </div>
 </div>
