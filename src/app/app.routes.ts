@@ -27,6 +27,25 @@ export const routes: Routes = [
     data: { roles: ['ADMIN'] } // Seulement pour les admins
   },
   {
+    path: 'ventes',
+    canActivate: [authGuard],
+    children: [
+      {
+        path: 'point-vente',
+        loadComponent: () => import('./features/ventes/components/point-vente/point-vente').then(m => m.PointVenteComponent)
+      },
+      {
+        path: 'liste',
+        loadComponent: () => import('./features/ventes/components/vente-list/vente-list').then(m => m.VenteListComponent)
+      },
+      {
+        path: '',
+        redirectTo: 'point-vente',
+        pathMatch: 'full'
+      }
+    ]
+  },
+  {
     path: 'commandes',
     canActivate: [authGuard],
     children: [
@@ -34,6 +53,7 @@ export const routes: Routes = [
         path: '',
         loadComponent: () => import('./features/commandes/components/commande-list/commande-list').then(m => m.CommandeListComponent)
       },
+    
       {
         path: 'nouveau',
         loadComponent: () => import('./features/commandes/components/commande-form/commande-form').then(m => m.CommandeFormComponent)

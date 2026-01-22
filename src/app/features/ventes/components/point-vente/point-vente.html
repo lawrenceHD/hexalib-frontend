@@ -1,0 +1,229 @@
+<div class="min-h-screen bg-gray-50 antialiased">
+  <div class="p-4 sm:p-6 lg:p-8">
+    <!-- En-tête -->
+    <div class="mb-6">
+      <h1 class="text-3xl font-bold text-gray-900">Point de Vente</h1>
+      <p class="mt-2 text-sm text-gray-600">Recherchez et ajoutez des livres au panier</p>
+    </div>
+
+    <!-- Grille 2 colonnes -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- COLONNE GAUCHE : Recherche et Catalogue (2/3) -->
+      <div class="lg:col-span-2 space-y-6">
+        
+        <!-- Barre de recherche -->
+        <div class="bg-white rounded-lg shadow-sm p-4">
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+              <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+              </svg>
+            </div>
+            <input
+              type="text"
+              [(ngModel)]="searchTerm"
+              (keyup.enter)="onSearch()"
+              placeholder="      Rechercher un livre par titre, auteur, code..."
+              class="block w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+            />
+          </div>
+        </div>
+
+        <!-- Liste des livres disponibles -->
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+          <div class="p-4 border-b border-gray-200">
+            <h2 class="text-lg font-semibold text-gray-900">Livres Disponibles</h2>
+            <p class="text-sm text-gray-600 mt-1">{{ livresDisponibles.length }} livre(s) en stock</p>
+          </div>
+
+          <!-- Loader -->
+          <div *ngIf="loadingLivres" class="flex justify-center items-center py-12">
+            <div class="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-indigo-600"></div>
+          </div>
+
+          <!-- Grille de livres -->
+          <div *ngIf="!loadingLivres" class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[600px] overflow-y-auto">
+            <div 
+              *ngFor="let livre of livresDisponibles" 
+              class="border border-gray-200 rounded-lg p-4 hover:border-indigo-500 hover:shadow-md transition-all cursor-pointer"
+              (click)="ajouterAuPanier(livre)"
+            >
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <h3 class="font-semibold text-gray-900 line-clamp-2">{{ livre.titre }}</h3>
+                  <p class="text-sm text-gray-600 mt-1">{{ livre.auteur }}</p>
+                  <p class="text-xs text-gray-500 mt-1">Code: {{ livre.code }}</p>
+                </div>
+                <div class="ml-4 text-right">
+                  <p class="text-lg font-bold text-indigo-600">{{ livre.prixVente | number:'1.0-0' }} XAF</p>
+                  <span 
+                    class="inline-flex items-center px-2 py-1 rounded text-xs font-medium mt-2"
+                    [class.bg-green-100]="livre.quantiteStock > livre.seuilMinimal"
+                    [class.text-green-800]="livre.quantiteStock > livre.seuilMinimal"
+                    [class.bg-orange-100]="livre.quantiteStock <= livre.seuilMinimal && livre.quantiteStock > 0"
+                    [class.text-orange-800]="livre.quantiteStock <= livre.seuilMinimal && livre.quantiteStock > 0"
+                  >
+                    Stock: {{ livre.quantiteStock }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Message si aucun livre -->
+            <div *ngIf="livresDisponibles.length === 0" class="col-span-2 text-center py-12">
+              <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+              </svg>
+              <p class="mt-4 text-gray-600">Aucun livre disponible</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- COLONNE DROITE : Panier (1/3) -->
+      <div class="lg:col-span-1">
+        <div class="bg-white rounded-lg shadow-sm sticky top-6">
+          <!-- En-tête panier -->
+          <div class="p-4 border-b border-gray-200 bg-gradient-to-r from-indigo-600 to-purple-600">
+            <div class="flex items-center justify-between">
+              <h2 class="text-lg font-bold text-white">Panier</h2>
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-white text-indigo-600">
+                {{ panier.length }} article(s)
+              </span>
+            </div>
+          </div>
+
+          <!-- Contenu panier -->
+          <div class="p-4 space-y-4 max-h-[500px] overflow-y-auto">
+            
+            <!-- Panier vide -->
+            <div *ngIf="panier.length === 0" class="text-center py-12">
+              <svg class="mx-auto h-16 w-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+              </svg>
+              <p class="mt-4 text-gray-500">Le panier est vide</p>
+              <p class="text-sm text-gray-400 mt-2">Ajoutez des livres pour commencer</p>
+            </div>
+
+            <!-- Lignes du panier -->
+            <div *ngFor="let ligne of panier; let i = index" class="border border-gray-200 rounded-lg p-3 relative">
+              <!-- Bouton supprimer -->
+              <button
+                (click)="retirerDuPanier(i)"
+                class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
+                title="Retirer"
+              >
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              </button>
+
+              <div class="pr-6">
+                <h3 class="font-semibold text-gray-900 text-sm line-clamp-1">{{ ligne.livre.titre }}</h3>
+                <p class="text-xs text-gray-500 mt-1">{{ ligne.livre.code }}</p>
+
+                <!-- Quantité -->
+                <div class="flex items-center justify-between mt-3">
+                  <div class="flex items-center gap-2">
+                    <button
+                      (click)="modifierQuantite(ligne, ligne.quantite - 1)"
+                      [disabled]="ligne.quantite <= 1"
+                      class="w-7 h-7 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                      </svg>
+                    </button>
+                    <input
+                      type="number"
+                      [(ngModel)]="ligne.quantite"
+                      (change)="modifierQuantite(ligne, ligne.quantite)"
+                      min="1"
+                      [max]="ligne.livre.quantiteStock"
+                      class="w-12 text-center border border-gray-300 rounded py-1 text-sm"
+                    />
+                    <button
+                      (click)="modifierQuantite(ligne, ligne.quantite + 1)"
+                      [disabled]="ligne.quantite >= ligne.livre.quantiteStock"
+                      class="w-7 h-7 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                      </svg>
+                    </button>
+                  </div>
+                  <p class="text-sm font-semibold text-gray-900">{{ ligne.prixUnitaire | number:'1.0-0' }} XAF</p>
+                </div>
+
+                <!-- Réduction -->
+                <div *ngIf="ligne.montantReduction > 0" class="mt-2 text-xs">
+                  <div class="flex items-center justify-between text-green-600">
+                    <span>🎟️ {{ ligne.reductionAppliquee?.intitule }}</span>
+                    <span class="font-semibold">-{{ ligne.montantReduction | number:'1.0-0' }} XAF</span>
+                  </div>
+                </div>
+
+                <!-- Sous-total -->
+                <div class="mt-2 pt-2 border-t border-gray-200">
+                  <div class="flex items-center justify-between">
+                    <span class="text-xs text-gray-600">Sous-total</span>
+                    <span class="text-sm font-bold text-indigo-600">{{ ligne.sousTotal | number:'1.0-0' }} XAF</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Totaux et Actions -->
+          <div *ngIf="panier.length > 0" class="p-4 border-t border-gray-200 space-y-3">
+            <!-- Détails totaux -->
+            <div class="space-y-2">
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-600">Sous-total HT</span>
+                <span class="font-semibold">{{ totalHT | number:'1.0-0' }} XAF</span>
+              </div>
+              <div *ngIf="totalReductions > 0" class="flex justify-between text-sm text-green-600">
+                <span>Total réductions</span>
+                <span class="font-semibold">-{{ totalReductions | number:'1.0-0' }} XAF</span>
+              </div>
+              <div class="pt-2 border-t border-gray-300">
+                <div class="flex justify-between items-center">
+                  <span class="text-lg font-bold text-gray-900">TOTAL À PAYER</span>
+                  <span class="text-2xl font-bold text-indigo-600">{{ totalTTC | number:'1.0-0' }} XAF</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Boutons d'action -->
+            <div class="space-y-2">
+              <button
+                (click)="validerVente()"
+                [disabled]="processing"
+                class="w-full inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white font-bold rounded-lg hover:from-green-700 hover:to-green-800 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <svg *ngIf="!processing" class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <svg *ngIf="processing" class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                {{ processing ? 'Traitement...' : 'Valider la Vente' }}
+              </button>
+
+              <button
+                (click)="viderPanier()"
+                [disabled]="processing"
+                class="w-full px-6 py-2 text-red-600 border border-red-300 rounded-lg hover:bg-red-50 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Vider le Panier
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
