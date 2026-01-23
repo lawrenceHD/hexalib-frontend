@@ -197,10 +197,10 @@
 <!-- ============================================ -->
 <!-- MODAL DÉTAIL VENTE -->
 <!-- ============================================ -->
-<div *ngIf="showDetailModal && venteSelectionnee" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
-  <div class="relative bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+<div *ngIf="showDetailModal && venteSelectionnee" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4" style="margin:5px;padding:5px">
+  <div class="relative bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto" style="margin:5px;padding:5px">
     <!-- Header -->
-    <div class="flex items-center justify-between p-6 border-b border-gray-200">
+    <div class="flex items-center justify-between p-6 border-b border-gray-200" style="margin:5px;padding:5px">
       <div>
         <h3 class="text-2xl font-bold text-gray-900">Détail de la Vente</h3>
         <p class="mt-1 text-sm text-gray-600">{{ venteSelectionnee.numeroFacture }}</p>
@@ -217,10 +217,10 @@
     </div>
 
     <!-- Body -->
-    <div class="p-6 space-y-6">
+    <div class="p-6 space-y-6" style="margin:5px;padding:5px">
       
       <!-- Informations générales -->
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6" style="margin:5px;padding:5px">
         <div>
           <h4 class="text-sm font-medium text-gray-500 mb-3">Informations</h4>
           <dl class="space-y-2">
@@ -248,7 +248,7 @@
           </dl>
         </div>
 
-        <div>
+        <div style="margin:5px;padding:5px">
           <h4 class="text-sm font-medium text-gray-500 mb-3">Montants</h4>
           <dl class="space-y-2">
             <div class="flex justify-between">
@@ -268,13 +268,13 @@
       </div>
 
       <!-- Motif annulation -->
-      <div *ngIf="venteSelectionnee.statut === StatutVente.ANNULEE && venteSelectionnee.motifAnnulation" class="p-4 bg-red-50 border border-red-200 rounded-lg">
+      <div *ngIf="venteSelectionnee.statut === StatutVente.ANNULEE && venteSelectionnee.motifAnnulation" class="p-4 bg-red-50 border border-red-200 rounded-lg" style="margin:5px;padding:5px">
         <p class="text-sm font-medium text-red-800">Motif d'annulation :</p>
         <p class="text-sm text-red-700 mt-1">{{ venteSelectionnee.motifAnnulation }}</p>
       </div>
 
       <!-- Articles vendus -->
-      <div>
+      <div style="margin:5px;padding:5px">
         <h4 class="text-sm font-medium text-gray-500 mb-3">Articles Vendus</h4>
         <div class="border border-gray-200 rounded-lg overflow-hidden">
           <table class="w-full">
@@ -311,8 +311,9 @@
     </div>
 
     <!-- Footer -->
-    <div class="flex items-center justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50">
-      <button
+    <div class="flex items-center justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50" style="margin:5px;padding:5px">
+      <button 
+      style="margin:5px;padding:5px"
         (click)="telechargerFacture(venteSelectionnee.id)"
         class="inline-flex items-center px-6 py-2.5 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors"
       >
@@ -322,6 +323,7 @@
         Télécharger Facture
       </button>
       <button 
+      style="margin:5px;padding:5px"
         type="button" 
         (click)="closeDetailModal()" 
         class="px-6 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
