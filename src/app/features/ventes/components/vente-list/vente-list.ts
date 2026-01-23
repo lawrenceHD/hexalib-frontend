@@ -3,6 +3,7 @@ import { VenteService } from '../../services/vente';
 import { VenteResponse, StatutVente } from '../../models/vente.model';
 import { CommonModule } from '@angular/common';      // ← pour pipes (number, date, etc.) + *ngIf, *ngFor
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-vente-list',
@@ -33,11 +34,15 @@ export class VenteListComponent implements OnInit {
   venteSelectionnee: VenteResponse | null = null;
   showDetailModal = false;
 
-  constructor(private venteService: VenteService) {}
+  constructor(private venteService: VenteService, private router: Router) {}
 
   ngOnInit(): void {
     this.loadVentes();
   }
+
+  redirectToPointVente() {
+  this.router.navigate(['/ventes/point-vente']);
+}
 
   /**
    * Charger les ventes

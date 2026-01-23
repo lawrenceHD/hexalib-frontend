@@ -44,6 +44,21 @@ export class PointVenteComponent implements OnInit {
     this.loadLivresDisponibles();
   }
 
+  cancel(): void {
+    
+      this.router.navigate(['/ventes/liste']);
+   
+  }
+
+   goBack(): void {
+    this.router.navigate(['/ventes/liste']);
+  }
+ 
+
+redirectToPointVente() {
+  this.router.navigate(['/ventes/point-vente']);
+}
+
   /**
    * Charger les livres disponibles
    */
@@ -222,6 +237,8 @@ export class PointVenteComponent implements OnInit {
       });
     }
   }
+
+  
 
   /**
    * Télécharger la facture PDF

@@ -1,9 +1,26 @@
 <div class="min-h-screen bg-gray-50 antialiased" style="margin:5px;padding:5px">
+
+  <!-- En-tête avec bouton retour -->
+  <div class="mb-6 flex items-center justify-between">
+    <button
+       (click)="goBack()"
+      class="inline-flex items-center px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+    >
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+      </svg>
+      Retour aux ventes
+    </button>
+
+    
+  </div>
   <div class="p-4 sm:p-6 lg:p-8">
     <!-- En-tête -->
     <div class="mb-6">
       <h1 class="text-3xl font-bold text-gray-900">Point de Vente</h1>
       <p class="mt-2 text-sm text-gray-600">Recherchez et ajoutez des livres au panier</p>
+
+      
     </div>
 
     <!-- Grille 2 colonnes -->

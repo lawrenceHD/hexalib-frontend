@@ -7,7 +7,7 @@ import { authGuard } from '../../core/guards/auth.guard';
 const routes: Routes = [
   {
     path: '',
-    redirectTo: 'point-vente',
+    redirectTo: 'liste',
     pathMatch: 'full'
   },
   {

@@ -6,6 +6,7 @@ import { CategorieListComponent } from './features/categories/components/categor
 import { authGuard} from './core/guards/auth.guard';
 import { roleGuard } from './core/guards/role-guard';
 import { LivreListComponent } from './features/livres/components/livre-list/livre-list';
+
 import { ReductionListComponent } from './features/reductions/components/reduction-list/reduction-list';
 
 export const routes: Routes = [
@@ -19,13 +20,19 @@ export const routes: Routes = [
       { path: 'dashboard', component: DashboardComponent },
       { path: 'categories', component: CategorieListComponent },
       { path: 'livres', component: LivreListComponent },
-      { path: 'reductions', component: ReductionListComponent },
+      {
+    path: 'stock',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/stock/components/mouvement-list/mouvement-list')
+      .then(m => m.MouvementListComponent)
+  },
       {
     path: 'fournisseurs',
     loadComponent: () => import('./features/fournisseurs/components/fournisseur-list/fournisseur-list').then(m => m.FournisseurListComponent),
     canActivate: [authGuard, roleGuard],
     data: { roles: ['ADMIN'] } // Seulement pour les admins
   },
+  
   {
     path: 'ventes',
     canActivate: [authGuard],
@@ -40,7 +47,7 @@ export const routes: Routes = [
       },
       {
         path: '',
-        redirectTo: 'point-vente',
+        redirectTo: 'liste',
         pathMatch: 'full'
       }
     ]
