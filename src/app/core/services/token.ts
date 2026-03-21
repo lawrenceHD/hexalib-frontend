@@ -4,50 +4,47 @@ import { Injectable } from '@angular/core';
   providedIn: 'root'
 })
 export class TokenService {
-  private readonly TOKEN_KEY = 'auth_token';
-  private readonly USER_KEY = 'auth_user';
+  // ⚠️ Ces clés DOIVENT correspondre exactement à celles utilisées dans AuthService
+  private readonly TOKEN_KEY   = 'hexalib_access_token';
+  private readonly REFRESH_KEY = 'hexalib_refresh_token';
+  private readonly USER_KEY    = 'hexalib_user';
 
-  constructor() { }
-
-  // Sauvegarder le token
-  saveToken(token: string): void {
-    localStorage.setItem(this.TOKEN_KEY, token);
-  }
-
-  // Récupérer le token
   getToken(): string | null {
     return localStorage.getItem(this.TOKEN_KEY);
   }
 
-  // Supprimer le token
+  saveToken(token: string): void {
+    localStorage.setItem(this.TOKEN_KEY, token);
+  }
+
   removeToken(): void {
     localStorage.removeItem(this.TOKEN_KEY);
   }
 
-  // Sauvegarder l'utilisateur
+  getRefreshToken(): string | null {
+    return localStorage.getItem(this.REFRESH_KEY);
+  }
+
+  saveRefreshToken(token: string): void {
+    localStorage.setItem(this.REFRESH_KEY, token);
+  }
+
+  getUser(): any {
+    const raw = localStorage.getItem(this.USER_KEY);
+    return raw ? JSON.parse(raw) : null;
+  }
+
   saveUser(user: any): void {
     localStorage.setItem(this.USER_KEY, JSON.stringify(user));
   }
 
-  // Récupérer l'utilisateur
-  getUser(): any {
-    const user = localStorage.getItem(this.USER_KEY);
-    return user ? JSON.parse(user) : null;
-  }
-
-  // Supprimer l'utilisateur
-  removeUser(): void {
-    localStorage.removeItem(this.USER_KEY);
-  }
-
-  // Vérifier si l'utilisateur est connecté
   isLoggedIn(): boolean {
     return this.getToken() !== null;
   }
 
-  // Nettoyer tout
   clear(): void {
     localStorage.removeItem(this.TOKEN_KEY);
+    localStorage.removeItem(this.REFRESH_KEY);
     localStorage.removeItem(this.USER_KEY);
   }
 }
