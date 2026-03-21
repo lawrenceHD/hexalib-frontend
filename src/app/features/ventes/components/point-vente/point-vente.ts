@@ -2,17 +2,15 @@ import { Component, OnInit } from '@angular/core';
 import { VenteService } from '../../services/vente';
 import { LivreService } from '../../../livres/services/livre';
 import { ReductionService } from '../../../reductions/services/reduction';
-import { LignePanier, VenteRequest, LigneVenteRequest } from '../../models/vente.model';
+import { LignePanier, ReductionDisponible, VenteRequest } from '../../models/vente.model';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';      // ← pour pipes (number, date, etc.) + *ngIf, *ngFor
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-point-vente',
-  imports: [
-    CommonModule,     // Résout les pipes + directives de base
-    FormsModule       // Résout ngModel
-  ],
+  imports: [CommonModule, FormsModule],
   templateUrl: './point-vente.html',
   styleUrls: ['./point-vente.css']
 })
@@ -22,9 +20,13 @@ export class PointVenteComponent implements OnInit {
   livresDisponibles: any[] = [];
   loadingLivres = false;
 
+  // Réductions actives (chargées une seule fois)
+  reductionsActives: ReductionDisponible[] = [];
+  loadingReductions = false;
+
   // Panier
   panier: LignePanier[] = [];
-  
+
   // Totaux
   totalHT = 0;
   totalReductions = 0;
@@ -37,42 +39,74 @@ export class PointVenteComponent implements OnInit {
     private venteService: VenteService,
     private livreService: LivreService,
     private reductionService: ReductionService,
-    private router: Router
+    private router: Router,
+    private toastr: ToastrService
   ) {}
 
   ngOnInit(): void {
     this.loadLivresDisponibles();
+    this.loadReductionsActives();
   }
 
-  cancel(): void {
-    
-      this.router.navigate(['/ventes/liste']);
-   
-  }
-
-   goBack(): void {
+  goBack(): void {
     this.router.navigate(['/ventes/liste']);
   }
- 
 
-redirectToPointVente() {
-  this.router.navigate(['/ventes/point-vente']);
-}
+  redirectToPointVente(): void {
+    this.router.navigate(['/ventes/point-vente']);
+  }
 
   /**
-   * Charger les livres disponibles
+   * Charger les livres disponibles (stock > 0)
    */
   loadLivresDisponibles(): void {
     this.loadingLivres = true;
-    this.livreService.getAllLivres(0, 100, this.searchTerm, '', 'ACTIF', '').subscribe({
+    this.livreService.getAllLivres(0, 200, this.searchTerm, '', 'ACTIF', '').subscribe({
       next: (response) => {
-        this.livresDisponibles = response.data.content.filter(l => l.quantiteStock > 0);
+        this.livresDisponibles = response.data.content.filter((l: any) => l.quantiteStock > 0);
         this.loadingLivres = false;
       },
-      error: (err) => {
-        console.error(err);
+      error: () => {
+        this.toastr.error('Erreur lors du chargement des livres', 'Erreur');
         this.loadingLivres = false;
       }
+    });
+  }
+
+  /**
+   * Charger toutes les réductions actives (valides aujourd'hui)
+   */
+  loadReductionsActives(): void {
+    this.loadingReductions = true;
+    this.reductionService.getValides().subscribe({
+      next: (response) => {
+        this.reductionsActives = (response.data || []).map((r: any) => ({
+          id: r.id,
+          intitule: r.intitule,
+          type: r.type,
+          valeur: r.valeur,
+          cible: r.cible,
+          cibleId: r.cibleId,
+          estValide: r.estValide
+        }));
+        this.loadingReductions = false;
+      },
+      error: () => {
+        this.loadingReductions = false;
+      }
+    });
+  }
+
+  /**
+   * Filtrer les réductions applicables à un livre donné
+   * Règle : GLOBALE toujours + CATEGORIE si même catégorie + LIVRE si même livre
+   */
+  getReductionsApplicables(livre: any): ReductionDisponible[] {
+    return this.reductionsActives.filter(r => {
+      if (r.cible === 'GLOBALE') return true;
+      if (r.cible === 'LIVRE' && (r as any).cibleId === livre.id) return true;
+      if (r.cible === 'CATEGORIE' && (r as any).cibleId === livre.categorie?.id) return true;
+      return false;
     });
   }
 
@@ -87,81 +121,94 @@ redirectToPointVente() {
    * Ajouter un livre au panier
    */
   ajouterAuPanier(livre: any): void {
-    // Vérifier si le livre est déjà dans le panier
     const existant = this.panier.find(l => l.livre.id === livre.id);
-    
+
     if (existant) {
-      // Vérifier le stock
       if (existant.quantite + 1 > livre.quantiteStock) {
-        alert(`Stock insuffisant. Disponible: ${livre.quantiteStock}`);
+        this.toastr.warning(`Stock insuffisant. Disponible : ${livre.quantiteStock}`, 'Stock');
         return;
       }
       existant.quantite++;
+      this.recalculerLigne(existant);
     } else {
-      // Ajouter au panier
+      const reductionsApplicables = this.getReductionsApplicables(livre);
       const ligne: LignePanier = {
-        livre: livre,
+        livre,
         quantite: 1,
         prixUnitaire: livre.prixVente,
+        reductionChoisie: null,
+        reductionsDisponibles: reductionsApplicables,
         montantReduction: 0,
-        sousTotal: livre.prixVente
+        sousTotal: livre.prixVente,
+        showReductions: false
       };
       this.panier.push(ligne);
     }
 
-    // Charger et appliquer la réduction
-    this.appliquerReduction(this.panier[this.panier.length - 1] || existant!);
-    
     this.calculerTotaux();
   }
 
   /**
-   * Appliquer la meilleure réduction à une ligne
+   * Afficher/masquer le panneau de réductions d'une ligne
    */
-  appliquerReduction(ligne: LignePanier): void {
-    this.reductionService.getBestForLivre(ligne.livre.id).subscribe({
-      next: (response) => {
-        if (response.data) {
-          const reduction = response.data;
-          const montantBase = ligne.prixUnitaire * ligne.quantite;
-          
-          if (reduction.type === 'POURCENTAGE') {
-            ligne.montantReduction = (montantBase * reduction.valeur) / 100;
-          } else {
-            ligne.montantReduction = reduction.valeur;
-          }
-          
-          ligne.reductionAppliquee = reduction;
-          ligne.sousTotal = montantBase - ligne.montantReduction;
-        } else {
-          ligne.montantReduction = 0;
-          ligne.sousTotal = ligne.prixUnitaire * ligne.quantite;
-        }
-        this.calculerTotaux();
-      },
-      error: () => {
-        ligne.montantReduction = 0;
-        ligne.sousTotal = ligne.prixUnitaire * ligne.quantite;
-        this.calculerTotaux();
+  toggleReductions(ligne: LignePanier): void {
+    ligne.showReductions = !ligne.showReductions;
+  }
+
+  /**
+   * Appliquer une réduction choisie par le vendeur
+   */
+  appliquerReduction(ligne: LignePanier, reduction: ReductionDisponible): void {
+    ligne.reductionChoisie = reduction;
+    this.recalculerLigne(ligne);
+    ligne.showReductions = false;
+    this.toastr.success(`Réduction "${reduction.intitule}" appliquée`, 'Réduction');
+  }
+
+  /**
+   * Supprimer la réduction d'une ligne
+   */
+  supprimerReduction(ligne: LignePanier): void {
+    ligne.reductionChoisie = null;
+    this.recalculerLigne(ligne);
+    this.toastr.info('Réduction retirée', 'Panier');
+  }
+
+  /**
+   * Recalculer sous-total d'une ligne selon la réduction choisie
+   */
+  recalculerLigne(ligne: LignePanier): void {
+    const montantBase = ligne.prixUnitaire * ligne.quantite;
+
+    if (ligne.reductionChoisie) {
+      const r = ligne.reductionChoisie;
+      if (r.type === 'POURCENTAGE') {
+        ligne.montantReduction = Math.round((montantBase * r.valeur) / 100);
+      } else {
+        ligne.montantReduction = Math.min(r.valeur, montantBase); // Ne pas dépasser le prix
       }
-    });
+    } else {
+      ligne.montantReduction = 0;
+    }
+
+    ligne.sousTotal = montantBase - ligne.montantReduction;
+    this.calculerTotaux();
   }
 
   /**
    * Modifier la quantité d'une ligne
    */
   modifierQuantite(ligne: LignePanier, nouvelleQuantite: number): void {
-    if (nouvelleQuantite < 1) {
-      return;
-    }
+    if (nouvelleQuantite < 1) return;
 
     if (nouvelleQuantite > ligne.livre.quantiteStock) {
-      alert(`Stock insuffisant. Disponible: ${ligne.livre.quantiteStock}`);
-      return;
+      this.toastr.warning(`Stock insuffisant. Disponible : ${ligne.livre.quantiteStock}`, 'Stock');
+      ligne.quantite = ligne.livre.quantiteStock;
+    } else {
+      ligne.quantite = nouvelleQuantite;
     }
 
-    ligne.quantite = nouvelleQuantite;
-    this.appliquerReduction(ligne);
+    this.recalculerLigne(ligne);
   }
 
   /**
@@ -183,15 +230,11 @@ redirectToPointVente() {
   }
 
   /**
-   * Calculer les totaux
+   * Calculer les totaux globaux
    */
   calculerTotaux(): void {
-    this.totalHT = this.panier.reduce((sum, ligne) => 
-      sum + (ligne.prixUnitaire * ligne.quantite), 0);
-    
-    this.totalReductions = this.panier.reduce((sum, ligne) => 
-      sum + ligne.montantReduction, 0);
-    
+    this.totalHT = this.panier.reduce((sum, l) => sum + l.prixUnitaire * l.quantite, 0);
+    this.totalReductions = this.panier.reduce((sum, l) => sum + l.montantReduction, 0);
     this.totalTTC = this.totalHT - this.totalReductions;
   }
 
@@ -200,45 +243,38 @@ redirectToPointVente() {
    */
   validerVente(): void {
     if (this.panier.length === 0) {
-      alert('Le panier est vide');
+      this.toastr.warning('Le panier est vide', 'Panier');
       return;
     }
 
-    if (confirm(`Confirmer la vente de ${this.totalTTC} XAF ?`)) {
-      this.processing = true;
+    if (!confirm(`Confirmer la vente de ${this.totalTTC.toLocaleString('fr-FR')} XAF ?`)) return;
 
-      const request: VenteRequest = {
-        lignes: this.panier.map(ligne => ({
-          livreId: ligne.livre.id,
-          quantite: ligne.quantite
-        }))
-      };
+    this.processing = true;
 
-      this.venteService.create(request).subscribe({
-        next: (response) => {
-          alert('Vente enregistrée avec succès !');
-          const venteId = response.data.id;
-          
-          // Télécharger la facture
-          this.telechargerFacture(venteId);
-          
-          // Réinitialiser
-          this.panier = [];
-          this.calculerTotaux();
-          this.loadLivresDisponibles();
-          this.processing = false;
-        },
-        error: (err) => {
-          console.error(err);
-          const message = err.error?.message || 'Erreur lors de la vente';
-          alert(message);
-          this.processing = false;
-        }
-      });
-    }
+    const request: VenteRequest = {
+      lignes: this.panier.map(ligne => ({
+        livreId: ligne.livre.id,
+        quantite: ligne.quantite,
+        reductionId: ligne.reductionChoisie?.id // ← Envoyer la réduction choisie
+      }))
+    };
+
+    this.venteService.create(request).subscribe({
+      next: (response) => {
+        this.toastr.success('Vente enregistrée avec succès !', 'Succès');
+        const venteId = response.data.id;
+        this.telechargerFacture(venteId);
+        this.panier = [];
+        this.calculerTotaux();
+        this.loadLivresDisponibles();
+        this.processing = false;
+      },
+      error: (err) => {
+        this.toastr.error(err.message || 'Erreur lors de la vente', 'Erreur');
+        this.processing = false;
+      }
+    });
   }
-
-  
 
   /**
    * Télécharger la facture PDF
@@ -253,9 +289,16 @@ redirectToPointVente() {
         link.click();
         window.URL.revokeObjectURL(url);
       },
-      error: (err) => {
-        console.error('Erreur téléchargement facture', err);
+      error: () => {
+        this.toastr.error('Erreur lors du téléchargement de la facture', 'Erreur');
       }
     });
+  }
+
+  /**
+   * Formater la valeur d'une réduction pour l'affichage
+   */
+  formatReduction(r: ReductionDisponible): string {
+    return r.type === 'POURCENTAGE' ? `${r.valeur}%` : `${r.valeur.toLocaleString('fr-FR')} XAF`;
   }
 }

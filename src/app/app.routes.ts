@@ -39,12 +39,13 @@ export const routes: Routes = [
       { path: 'reductions', component: ReductionListComponent },
 
       // ── Ventes (admin + vendeur) ───────────────────────────────────────────
-      {
-        path:          'ventes',
-        loadComponent: () =>
-          import('./features/ventes/components/point-vente/point-vente')
-            .then(m => m.PointVenteComponent)
-      },
+     {
+  path: 'ventes',
+  loadChildren: () =>
+    import('./features/ventes/ventes-routing-module')
+      .then(m => m.VentesRoutingModule),
+  canActivate: [authGuard]
+},
 
       // ── Rapports (admin uniquement) ───────────────────────────────────────
       {

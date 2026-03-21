@@ -6,6 +6,7 @@ export enum StatutVente {
 export interface LigneVenteRequest {
   livreId: string;
   quantite: number;
+  reductionId?: string; // ← Le vendeur peut choisir une réduction (optionnel)
 }
 
 export interface VenteRequest {
@@ -51,12 +52,24 @@ export interface GlobalStatsResponse {
   chiffreAffaires: number;
 }
 
+// Interface pour une réduction dans le panier
+export interface ReductionDisponible {
+  id: string;
+  intitule: string;
+  type: 'POURCENTAGE' | 'MONTANT_FIXE';
+  valeur: number;
+  cible: string;
+  estValide: boolean;
+}
+
 // Interface pour le panier côté client
 export interface LignePanier {
-  livre: any; // Type Livre de votre module livres
+  livre: any;
   quantite: number;
   prixUnitaire: number;
-  reductionAppliquee?: any; // Type Reduction
+  reductionChoisie?: ReductionDisponible | null; // ← Réduction choisie par le vendeur
+  reductionsDisponibles: ReductionDisponible[];  // ← Liste des réductions disponibles pour ce livre
   montantReduction: number;
   sousTotal: number;
+  showReductions?: boolean; // ← Afficher/masquer le panneau de réductions
 }

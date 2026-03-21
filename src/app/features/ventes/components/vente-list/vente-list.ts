@@ -1,16 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { VenteService } from '../../services/vente';
 import { VenteResponse, StatutVente } from '../../models/vente.model';
-import { CommonModule } from '@angular/common';      // ← pour pipes (number, date, etc.) + *ngIf, *ngFor
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { AuthService } from '../../../../core/services/auth';
 
 @Component({
   selector: 'app-vente-list',
-  imports: [
-    CommonModule,     // Résout les pipes + directives de base
-    FormsModule       // Résout ngModel
-  ],
+  imports: [CommonModule, FormsModule],
   templateUrl: './vente-list.html',
   styleUrls: ['./vente-list.css']
 })
@@ -24,7 +22,7 @@ export class VenteListComponent implements OnInit {
   totalElements = 0;
   totalPages = 0;
 
-  // Recherche
+  // Recherche (admin uniquement)
   searchTerm = '';
 
   // Enum pour le template
@@ -34,25 +32,39 @@ export class VenteListComponent implements OnInit {
   venteSelectionnee: VenteResponse | null = null;
   showDetailModal = false;
 
-  constructor(private venteService: VenteService, private router: Router) {}
+  constructor(
+    private venteService: VenteService,
+    private router: Router,
+    public authService: AuthService
+  ) {}
 
   ngOnInit(): void {
     this.loadVentes();
   }
 
-  redirectToPointVente() {
-  this.router.navigate(['/ventes/point-vente']);
-}
+  redirectToPointVente(): void {
+    this.router.navigate(['/ventes/point-vente']);
+  }
 
   /**
-   * Charger les ventes
+   * Charger les ventes selon le rôle :
+   * - ADMIN → toutes les ventes (avec recherche possible)
+   * - VENDEUR → uniquement ses propres ventes
    */
   loadVentes(): void {
     this.loading = true;
 
-    const request$ = this.searchTerm
-      ? this.venteService.search(this.searchTerm, this.currentPage, this.pageSize)
-      : this.venteService.getAll(this.currentPage, this.pageSize);
+    let request$;
+
+    if (this.authService.isAdmin()) {
+      // Admin : toutes les ventes, avec recherche
+      request$ = this.searchTerm
+        ? this.venteService.search(this.searchTerm, this.currentPage, this.pageSize)
+        : this.venteService.getAll(this.currentPage, this.pageSize);
+    } else {
+      // Vendeur : uniquement ses ventes
+      request$ = this.venteService.getMesVentes(this.currentPage, this.pageSize);
+    }
 
     request$.subscribe({
       next: (response) => {
@@ -68,41 +80,26 @@ export class VenteListComponent implements OnInit {
     });
   }
 
-  /**
-   * Rechercher
-   */
   onSearch(): void {
     this.currentPage = 0;
     this.loadVentes();
   }
 
-  /**
-   * Changer de page
-   */
   onPageChange(page: number): void {
     this.currentPage = page;
     this.loadVentes();
   }
 
-  /**
-   * Voir le détail d'une vente
-   */
   voirDetail(vente: VenteResponse): void {
     this.venteSelectionnee = vente;
     this.showDetailModal = true;
   }
 
-  /**
-   * Fermer le modal détail
-   */
   closeDetailModal(): void {
     this.showDetailModal = false;
     this.venteSelectionnee = null;
   }
 
-  /**
-   * Télécharger la facture
-   */
   telechargerFacture(venteId: string): void {
     this.venteService.getFacturePDF(venteId).subscribe({
       next: (blob) => {
@@ -113,21 +110,16 @@ export class VenteListComponent implements OnInit {
         link.click();
         window.URL.revokeObjectURL(url);
       },
-      error: (err) => {
-        console.error('Erreur téléchargement facture', err);
-        alert('Erreur lors du téléchargement de la facture');
-      }
+      error: () => alert('Erreur lors du téléchargement de la facture')
     });
   }
 
   /**
-   * Annuler une vente (Admin uniquement)
+   * Annuler une vente — admin uniquement
    */
   annulerVente(vente: VenteResponse): void {
     const motif = prompt('Motif d\'annulation :');
-    if (!motif) {
-      return;
-    }
+    if (!motif) return;
 
     if (confirm(`Confirmer l'annulation de la vente ${vente.numeroFacture} ?`)) {
       this.venteService.annuler(vente.id, motif).subscribe({
@@ -136,25 +128,15 @@ export class VenteListComponent implements OnInit {
           this.loadVentes();
           this.closeDetailModal();
         },
-        error: (err) => {
-          console.error(err);
-          alert('Erreur lors de l\'annulation');
-        }
+        error: () => alert('Erreur lors de l\'annulation')
       });
     }
   }
 
-  /**
-   * Formater la date
-   */
   formatDate(dateStr: string): string {
-    const date = new Date(dateStr);
-    return date.toLocaleDateString('fr-FR', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
+    return new Date(dateStr).toLocaleDateString('fr-FR', {
+      day: '2-digit', month: '2-digit', year: 'numeric',
+      hour: '2-digit', minute: '2-digit'
     });
   }
 }

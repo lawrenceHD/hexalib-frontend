@@ -1,35 +1,29 @@
 <div class="min-h-screen bg-gray-50 antialiased" style="margin:5px;padding:5px">
 
-  <!-- En-tête avec bouton retour -->
-  <div class="mb-6 flex items-center justify-between">
-    <button
-       (click)="goBack()"
-      class="inline-flex items-center px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-    >
+  <!-- En-tête -->
+  <div class="mb-6 flex items-center justify-between px-4 pt-4" style="margin:5px;padding:5px">
+    <button (click)="goBack()"
+    style="margin:5px;padding:5px"
+      class="inline-flex items-center px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors">
       <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
       </svg>
       Retour aux ventes
     </button>
-
-    
   </div>
-  <div class="p-4 sm:p-6 lg:p-8">
-    <!-- En-tête -->
+
+  <div class="p-4 sm:p-6" style="margin:5px;padding:5px">
     <div class="mb-6">
       <h1 class="text-3xl font-bold text-gray-900">Point de Vente</h1>
-      <p class="mt-2 text-sm text-gray-600">Recherchez et ajoutez des livres au panier</p>
-
-      
+      <p class="mt-2 text-sm text-gray-600">Recherchez des livres et appliquez des réductions manuellement</p>
     </div>
 
-    <!-- Grille 2 colonnes -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      
-      <!-- COLONNE GAUCHE : Recherche et Catalogue (2/3) -->
-      <div class="lg:col-span-2 space-y-6">
-        
-        <!-- Barre de recherche -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6" style="margin:5px;padding:5px">
+
+      <!-- ═══ COLONNE GAUCHE : Catalogue ═══ -->
+      <div class="lg:col-span-2 space-y-4" style="margin:5px;padding:5px">
+
+        <!-- Recherche -->
         <div class="bg-white rounded-lg shadow-sm p-4" style="margin:5px;padding:5px">
           <div class="relative">
             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -37,214 +31,227 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
               </svg>
             </div>
-            <input
-              type="text"
-              [(ngModel)]="searchTerm"
-              (keyup.enter)="onSearch()"
-              placeholder="      Rechercher un livre par titre, auteur, code..."
-              class="block w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-            />
+            <input type="text" [(ngModel)]="searchTerm" (keyup.enter)="onSearch()"
+            style="margin:5px;padding:5px"
+              placeholder="       Rechercher un livre par titre, auteur, code..."
+              class="block w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
           </div>
         </div>
 
-        <!-- Liste des livres disponibles -->
+        <!-- Liste livres -->
         <div class="bg-white rounded-lg shadow-sm overflow-hidden" style="margin:5px;padding:5px">
           <div class="p-4 border-b border-gray-200" style="margin:5px;padding:5px">
             <h2 class="text-lg font-semibold text-gray-900">Livres Disponibles</h2>
-            <p class="text-sm text-gray-600 mt-1">{{ livresDisponibles.length }} livre(s) en stock</p>
+            <p class="text-sm text-gray-500 mt-1">{{ livresDisponibles.length }} livre(s) en stock</p>
           </div>
 
-          <!-- Loader -->
-          <div *ngIf="loadingLivres" class="flex justify-center items-center py-12">
+          <div *ngIf="loadingLivres" class="flex justify-center items-center py-12" style="margin:5px;padding:5px">
             <div class="animate-spin rounded-full h-12 w-12 border-4 border-gray-200 border-t-indigo-600"></div>
           </div>
 
-          <!-- Grille de livres -->
-          <div *ngIf="!loadingLivres" class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[600px] overflow-y-auto" style="margin:5px;padding:5px">
-            <div style="margin:5px;padding:5px"
-              *ngFor="let livre of livresDisponibles" 
-              class="border border-gray-200 rounded-lg p-4 hover:border-indigo-500 hover:shadow-md transition-all cursor-pointer"
-              (click)="ajouterAuPanier(livre)"
-            >
+          <div *ngIf="!loadingLivres" class="p-4 grid grid-cols-1 md:grid-cols-2 gap-3 max-h-[600px] overflow-y-auto" style="margin:5px;padding:5px">
+            <div *ngFor="let livre of livresDisponibles"
+              class="border border-gray-200 rounded-lg p-4 hover:border-indigo-400 hover:shadow-md transition-all cursor-pointer"
+              style="margin:5px;padding:5px"
+              (click)="ajouterAuPanier(livre)">
               <div class="flex items-start justify-between" style="margin:5px;padding:5px">
                 <div class="flex-1">
-                  <h3 class="font-semibold text-gray-900 line-clamp-2">{{ livre.titre }}</h3>
-                  <p class="text-sm text-gray-600 mt-1">{{ livre.auteur }}</p>
-                  <p class="text-xs text-gray-500 mt-1">Code: {{ livre.code }}</p>
+                  <h3 class="font-semibold text-gray-900 line-clamp-2 text-sm">{{ livre.titre }}</h3>
+                  <p class="text-xs text-gray-500 mt-1">{{ livre.auteur }}</p>
+                  <p class="text-xs text-gray-400 mt-0.5">{{ livre.code }}</p>
                 </div>
-                <div class="ml-4 text-right">
-                  <p class="text-lg font-bold text-indigo-600">{{ livre.prixVente | number:'1.0-0' }} XAF</p>
-                  <span 
-                    class="inline-flex items-center px-2 py-1 rounded text-xs font-medium mt-2"
+                <div class="ml-3 text-right shrink-0">
+                  <p class="text-base font-bold text-indigo-600">{{ livre.prixVente | number:'1.0-0' }} XAF</p>
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium mt-1"
                     [class.bg-green-100]="livre.quantiteStock > livre.seuilMinimal"
-                    [class.text-green-800]="livre.quantiteStock > livre.seuilMinimal"
+                    [class.text-green-700]="livre.quantiteStock > livre.seuilMinimal"
                     [class.bg-orange-100]="livre.quantiteStock <= livre.seuilMinimal && livre.quantiteStock > 0"
-                    [class.text-orange-800]="livre.quantiteStock <= livre.seuilMinimal && livre.quantiteStock > 0"
-                  >
-                    Stock: {{ livre.quantiteStock }}
+                    [class.text-orange-700]="livre.quantiteStock <= livre.seuilMinimal && livre.quantiteStock > 0">
+                    Stock : {{ livre.quantiteStock }}
                   </span>
                 </div>
               </div>
             </div>
 
-            <!-- Message si aucun livre -->
-            <div *ngIf="livresDisponibles.length === 0" class="col-span-2 text-center py-12">
-              <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+            <div *ngIf="livresDisponibles.length === 0" class="col-span-2 text-center py-12 text-gray-500" style="margin:5px;padding:5px">
+              <svg class="mx-auto h-12 w-12 text-gray-300 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253"/>
               </svg>
-              <p class="mt-4 text-gray-600">Aucun livre disponible</p>
+              Aucun livre disponible
             </div>
           </div>
         </div>
       </div>
 
-      <!-- COLONNE DROITE : Panier (1/3) -->
+      <!-- ═══ COLONNE DROITE : Panier ═══ -->
       <div class="lg:col-span-1" style="margin:5px;padding:5px">
-        <div class="bg-white rounded-lg shadow-sm sticky top-6">
-          <!-- En-tête panier -->
-          <div class="p-4 border-b border-gray-200 bg-gradient-to-r from-indigo-600 to-purple-600" style="margin:5px;padding:5px">
-            <div class="flex items-center justify-between" style="margin:5px;padding:5px">
+        <div class="bg-white rounded-lg shadow-sm sticky top-6" style="margin:5px;padding:5px">
+
+          <!-- Header panier -->
+          <div class="p-4 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-t-lg" style="margin:5px;padding:5px">
+            <div class="flex items-center justify-between">
               <h2 class="text-lg font-bold text-white">Panier</h2>
-              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-bold bg-white text-indigo-600">
+              <span class="px-3 py-1 rounded-full text-sm font-bold bg-white text-indigo-600">
                 {{ panier.length }} article(s)
               </span>
             </div>
           </div>
 
-          <!-- Contenu panier -->
-          <div class="p-4 space-y-4 max-h-[500px] overflow-y-auto" style="margin:5px;padding:5px">
-            
+          <!-- Lignes panier -->
+          <div class="p-3 space-y-3 max-h-[520px] overflow-y-auto" style="margin:5px;padding:5px">
+
             <!-- Panier vide -->
             <div *ngIf="panier.length === 0" class="text-center py-12" style="margin:5px;padding:5px">
-              <svg class="mx-auto h-16 w-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="mx-auto h-14 w-14 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
               </svg>
-              <p class="mt-4 text-gray-500">Le panier est vide</p>
-              <p class="text-sm text-gray-400 mt-2">Ajoutez des livres pour commencer</p>
+              <p class="mt-3 text-gray-500 text-sm">Le panier est vide</p>
             </div>
 
-            <!-- Lignes du panier -->
-            <div *ngFor="let ligne of panier; let i = index" class="border border-gray-200 rounded-lg p-3 relative" style="margin:5px;padding:5px">
+            <!-- Une ligne du panier -->
+            <div *ngFor="let ligne of panier; let i = index"
+              class="border border-gray-200 rounded-lg p-3 relative bg-gray-50">
+
               <!-- Bouton supprimer -->
-              <button
-                (click)="retirerDuPanier(i)" style="margin:5px;padding:5px"
-                class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 transition-colors"
-                title="Retirer"
-              >
-                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <button (click)="retirerDuPanier(i)"
+              style="margin:5px;padding:5px"
+                class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 z-10">
+                <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
               </button>
 
-              <div class="pr-6" style="margin:5px;padding:5px">
-                <h3 class="font-semibold text-gray-900 text-sm line-clamp-1">{{ ligne.livre.titre }}</h3>
-                <p class="text-xs text-gray-500 mt-1">{{ ligne.livre.code }}</p>
+              <!-- Titre et code -->
+              <h3 class="font-semibold text-gray-900 text-sm line-clamp-1 pr-4">{{ ligne.livre.titre }}</h3>
+              <p class="text-xs text-gray-400">{{ ligne.livre.code }}</p>
 
-                <!-- Quantité -->
-                <div class="flex items-center justify-between mt-3" style="margin:5px;padding:5px">
-                  <div class="flex items-center gap-2">
-                    <button 
-                    style="margin:5px;padding:5px"
-                      (click)="modifierQuantite(ligne, ligne.quantite - 1)"
-                      [disabled]="ligne.quantite <= 1"
-                      class="w-7 h-7 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
-                      </svg>
-                    </button>
-                    <input
-                      type="number"
-                      [(ngModel)]="ligne.quantite"
-                      (change)="modifierQuantite(ligne, ligne.quantite)"
-                      min="1"
-                      [max]="ligne.livre.quantiteStock"
-                      class="w-12 text-center border border-gray-300 rounded py-1 text-sm"
-                    />
-                    <button 
-                    style="margin:5px;padding:5px"
-                      (click)="modifierQuantite(ligne, ligne.quantite + 1)"
-                      [disabled]="ligne.quantite >= ligne.livre.quantiteStock"
-                      class="w-7 h-7 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-                      </svg>
-                    </button>
-                  </div>
-                  <p class="text-sm font-semibold text-gray-900">{{ ligne.prixUnitaire | number:'1.0-0' }} XAF</p>
+              <!-- Contrôle quantité -->
+              <div class="flex items-center justify-between mt-2" style="margin:5px;padding:5px">
+                <div class="flex items-center gap-1">
+                  <button (click)="modifierQuantite(ligne, ligne.quantite - 1)" [disabled]="ligne.quantite <= 1"
+                    class="w-6 h-6 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-200 disabled:opacity-40 text-xs">−</button>
+                  <input type="number" [(ngModel)]="ligne.quantite"
+                    (change)="modifierQuantite(ligne, ligne.quantite)"
+                    min="1" [max]="ligne.livre.quantiteStock"
+                    class="w-10 text-center border border-gray-300 rounded py-0.5 text-sm"/>
+                  <button (click)="modifierQuantite(ligne, ligne.quantite + 1)"
+                    [disabled]="ligne.quantite >= ligne.livre.quantiteStock"
+                    class="w-6 h-6 flex items-center justify-center border border-gray-300 rounded hover:bg-gray-200 disabled:opacity-40 text-xs">+</button>
                 </div>
+                <span class="text-sm font-semibold text-gray-700">{{ ligne.prixUnitaire | number:'1.0-0' }} XAF</span>
+              </div>
 
-                <!-- Réduction -->
-                <div *ngIf="ligne.montantReduction > 0" class="mt-2 text-xs" style="margin:5px;padding:5px">
-                  <div class="flex items-center justify-between text-green-600">
-                    <span>🎟️ {{ ligne.reductionAppliquee?.intitule }}</span>
-                    <span class="font-semibold">-{{ ligne.montantReduction | number:'1.0-0' }} XAF</span>
-                  </div>
+              <!-- ─── Réduction appliquée ─── -->
+              <div *ngIf="ligne.reductionChoisie" class="mt-2 flex items-center justify-between bg-green-50 border border-green-200 rounded px-2 py-1" style="margin:5px;padding:5px">
+                <div class="flex items-center gap-1 min-w-0">
+                  <span class="text-green-600 text-xs">🎟️</span>
+                  <span class="text-green-700 text-xs font-medium truncate">{{ ligne.reductionChoisie.intitule }}</span>
+                  <span class="text-green-600 text-xs font-bold">({{ formatReduction(ligne.reductionChoisie) }})</span>
                 </div>
+                <button (click)="supprimerReduction(ligne)"
+                  class="ml-2 text-red-400 hover:text-red-600 shrink-0" title="Retirer la réduction">
+                  <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                </button>
+              </div>
 
-                <!-- Sous-total -->
-                <div class="mt-2 pt-2 border-t border-gray-200" style="margin:5px;padding:5px">
-                  <div class="flex items-center justify-between" style="margin:5px;padding:5px">
-                    <span class="text-xs text-gray-600">Sous-total</span>
-                    <span class="text-sm font-bold text-indigo-600">{{ ligne.sousTotal | number:'1.0-0' }} XAF</span>
+              <!-- ─── Bouton choisir réduction ─── -->
+              <div class="mt-2" style="margin:5px;padding:5px">
+                <button (click)="toggleReductions(ligne)"
+                  [disabled]="ligne.reductionsDisponibles.length === 0"
+                  class="w-full text-xs py-1 px-2 rounded border transition-colors"
+                  [class.border-indigo-300]="ligne.reductionsDisponibles.length > 0"
+                  [class.text-indigo-600]="ligne.reductionsDisponibles.length > 0"
+                  [class.hover:bg-indigo-50]="ligne.reductionsDisponibles.length > 0"
+                  [class.border-gray-200]="ligne.reductionsDisponibles.length === 0"
+                  [class.text-gray-400]="ligne.reductionsDisponibles.length === 0"
+                  [class.cursor-not-allowed]="ligne.reductionsDisponibles.length === 0">
+                  <span *ngIf="ligne.reductionsDisponibles.length === 0">Aucune réduction disponible</span>
+                  <span *ngIf="ligne.reductionsDisponibles.length > 0">
+                    🎟️ {{ ligne.showReductions ? 'Masquer' : 'Choisir une réduction' }}
+                    ({{ ligne.reductionsDisponibles.length }})
+                  </span>
+                </button>
+
+                <!-- Panneau liste réductions -->
+                <div *ngIf="ligne.showReductions && ligne.reductionsDisponibles.length > 0"
+                  class="mt-1 border border-indigo-200 rounded-lg bg-white shadow-md overflow-hidden" style="margin:5px;padding:5px">
+                  <div class="px-3 py-1.5 bg-indigo-50 border-b border-indigo-100">
+                    <p class="text-xs font-semibold text-indigo-700">Réductions disponibles</p>
+                  </div>
+                  <div class="max-h-40 overflow-y-auto" style="margin:5px;padding:5px">
+                    <div *ngFor="let reduction of ligne.reductionsDisponibles"
+                      (click)="appliquerReduction(ligne, reduction)"
+                      class="flex items-center justify-between px-3 py-2 hover:bg-indigo-50 cursor-pointer border-b border-gray-100 last:border-0 transition-colors"
+                      [class.bg-indigo-50]="ligne.reductionChoisie?.id === reduction.id">
+                      <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-gray-900 truncate">{{ reduction.intitule }}</p>
+                        <p class="text-xs text-gray-500">
+                          {{ reduction.cible === 'GLOBALE' ? 'Globale' : reduction.cible === 'LIVRE' ? 'Ce livre' : 'Catégorie' }}
+                        </p>
+                      </div>
+                      <div class="ml-2 shrink-0 flex items-center gap-1" style="margin:5px;padding:5px">
+                        <span class="text-sm font-bold text-green-600">-{{ formatReduction(reduction) }}</span>
+                        <svg *ngIf="ligne.reductionChoisie?.id === reduction.id"
+                          class="h-4 w-4 text-indigo-600" fill="currentColor" viewBox="0 0 20 20">
+                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                        </svg>
+                      </div>
+                    </div>
                   </div>
                 </div>
+              </div>
+
+              <!-- Sous-total ligne -->
+              <div class="mt-2 pt-2 border-t border-gray-200 flex items-center justify-between" style="margin:5px;padding:5px">
+                <div class="text-xs text-gray-500">
+                  <span *ngIf="ligne.montantReduction > 0" class="text-green-600">
+                    -{{ ligne.montantReduction | number:'1.0-0' }} XAF
+                  </span>
+                </div>
+                <span class="text-sm font-bold text-indigo-600">{{ ligne.sousTotal | number:'1.0-0' }} XAF</span>
               </div>
             </div>
           </div>
 
-          <!-- Totaux et Actions -->
+          <!-- Totaux et boutons -->
           <div *ngIf="panier.length > 0" class="p-4 border-t border-gray-200 space-y-3" style="margin:5px;padding:5px">
-            <!-- Détails totaux -->
-            <div class="space-y-2" style="margin:5px;padding:5px">
-              <div class="flex justify-between text-sm">
-                <span class="text-gray-600">Sous-total HT</span>
+            <div class="space-y-1.5">
+              <div class="flex justify-between text-sm text-gray-600">
+                <span>Sous-total HT</span>
                 <span class="font-semibold">{{ totalHT | number:'1.0-0' }} XAF</span>
               </div>
-              <div *ngIf="totalReductions > 0" class="flex justify-between text-sm text-green-600" style="margin:5px;padding:5px">
+              <div *ngIf="totalReductions > 0" class="flex justify-between text-sm text-green-600">
                 <span>Total réductions</span>
                 <span class="font-semibold">-{{ totalReductions | number:'1.0-0' }} XAF</span>
               </div>
-              <div class="pt-2 border-t border-gray-300">
-                <div class="flex justify-between items-center">
-                  <span class="text-lg font-bold text-gray-900">TOTAL À PAYER</span>
-                  <span class="text-2xl font-bold text-indigo-600">{{ totalTTC | number:'1.0-0' }} XAF</span>
-                </div>
+              <div class="pt-2 border-t border-gray-300 flex justify-between items-center">
+                <span class="font-bold text-gray-900">TOTAL À PAYER</span>
+                <span class="text-2xl font-bold text-indigo-600">{{ totalTTC | number:'1.0-0' }} XAF</span>
               </div>
             </div>
 
-            <!-- Boutons d'action -->
-            <div class="space-y-2">
-              <button 
-              style="margin:5px;padding:5px"
-                (click)="validerVente()"
-                [disabled]="processing"
-                class="w-full inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white font-bold rounded-lg hover:from-green-700 hover:to-green-800 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                <svg *ngIf="!processing" class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                <svg *ngIf="processing" class="animate-spin -ml-1 mr-2 h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                {{ processing ? 'Traitement...' : 'Valider la Vente' }}
-              </button>
+            <button (click)="validerVente()" [disabled]="processing"
+              class="w-full inline-flex items-center justify-center px-6 py-3 bg-gradient-to-r from-green-600 to-green-700 text-white font-bold rounded-lg hover:from-green-700 hover:to-green-800 transition-all disabled:opacity-50">
+              <svg *ngIf="!processing" class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <svg *ngIf="processing" class="animate-spin h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+              </svg>
+              {{ processing ? 'Traitement...' : 'Valider la Vente' }}
+            </button>
 
-              <button 
-              style="margin:5px;padding:5px"
-                (click)="viderPanier()"
-                [disabled]="processing"
-                class="w-full px-6 py-2 text-red-600 border border-red-300 rounded-lg hover:bg-red-50 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Vider le Panier
-              </button>
-            </div>
+            <button (click)="viderPanier()" [disabled]="processing"
+              class="w-full px-6 py-2 text-red-600 border border-red-300 rounded-lg hover:bg-red-50 transition-colors font-medium text-sm disabled:opacity-50">
+              Vider le Panier
+            </button>
           </div>
+
         </div>
       </div>
-
     </div>
   </div>
 </div>
