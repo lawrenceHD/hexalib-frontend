@@ -6,6 +6,7 @@ import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import { ApiResponse } from '../../../core/models/api-response.model';
 import { Livre, LivreRequest, PageResponse } from '../models/livre.model';
+import { ImportResultResponse } from '../models/livre.model';
 
 @Injectable({
   providedIn: 'root'
@@ -92,4 +93,17 @@ export class LivreService {
     }
     return this.http.patch<ApiResponse<Livre>>(`${this.apiUrl}/${id}/ajuster-stock`, {}, { params });
   }
+
+  // ── Importer des livres depuis Excel ──
+importLivres(file: File, categorieId: string): Observable<ApiResponse<ImportResultResponse>> {
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('categorieId', categorieId);
+  return this.http.post<ApiResponse<ImportResultResponse>>(`${this.apiUrl}/import`, formData);
+}
+ 
+// ── Exporter l'inventaire en Excel ──
+exportLivres(): Observable<Blob> {
+  return this.http.get(`${this.apiUrl}/export`, { responseType: 'blob' });
+}
 }
