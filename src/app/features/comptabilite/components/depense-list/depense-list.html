@@ -1,0 +1,208 @@
+<div class="p-4 sm:p-6 lg:p-8 min-h-screen bg-gray-50 antialiased">
+
+  <!-- En-tête -->
+  <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">Gestion des Dépenses</h1>
+      <p class="mt-1 text-sm text-gray-500">{{ totalElements }} dépense(s) au total</p>
+    </div>
+    <button (click)="openCreateModal()" style="padding: 0.75rem 1rem;"
+      class="inline-flex items-center bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-all shadow-md">
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+      </svg>
+      Nouvelle Dépense
+    </button>
+    <a routerLink="/comptabilite/categories" style="padding: 0.75rem 1rem;"
+  class="inline-flex items-center bg-gray-600 hover:bg-gray-700 text-white font-medium rounded-lg transition-all shadow-md">
+  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+      d="M7 7h.01M17 17h.01M7 17L17 7"/>
+  </svg>
+  Catégories
+</a>
+  </div>
+
+  <!-- Filtres -->
+  <div class="mb-6 flex flex-wrap gap-3" style="margin:5px;padding:5px">
+    <select [(ngModel)]="selectedCategorieId" (change)="onFilterChange()"
+      class="px-4 py-2 border border-gray-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
+      <option value="">Toutes les catégories</option>
+      <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.nom }}</option>
+    </select>
+    <input type="date" [(ngModel)]="debut" (change)="onFilterChange()"
+      class="px-4 py-2 border border-gray-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+    <input type="date" [(ngModel)]="fin" (change)="onFilterChange()"
+      class="px-4 py-2 border border-gray-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+    <button (click)="resetFilters()"
+      class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg text-sm font-medium transition-colors">
+      Réinitialiser
+    </button>
+  </div>
+
+  <!-- Loader -->
+  <div *ngIf="loading" class="flex justify-center items-center py-32">
+    <div class="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 border-t-indigo-600"></div>
+  </div>
+
+  <!-- Tableau -->
+  <div *ngIf="!loading" class="bg-white rounded-lg shadow-sm overflow-hidden" style="margin:5px;padding:5px">
+    <table class="w-full min-w-max table-auto">
+      <thead class="border-b border-gray-100">
+        <tr>
+          <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-gray-600">Date</th>
+          <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-gray-600">Description</th>
+          <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-gray-600">Catégorie</th>
+          <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-gray-600">Référence</th>
+          <th class="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider text-gray-600">Montant</th>
+          <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-gray-600">Enregistré par</th>
+          <th class="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider text-gray-600">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-100">
+        <tr *ngFor="let dep of depenses" class="hover:bg-gray-50 transition-colors">
+          <td class="px-6 py-4 text-sm text-gray-900">{{ dep.dateDepense | date:'dd/MM/yyyy' }}</td>
+          <td class="px-6 py-4 text-sm font-medium text-gray-900">{{ dep.description }}</td>
+          <td class="px-6 py-4">
+            <span class="inline-flex px-2.5 py-1 text-xs font-medium bg-indigo-100 text-indigo-700 rounded-full">
+              {{ dep.categorieNom }}
+            </span>
+          </td>
+          <td class="px-6 py-4 text-sm text-gray-500">{{ dep.reference || '—' }}</td>
+          <td class="px-6 py-4 text-right">
+            <span class="text-sm font-bold text-red-600">{{ dep.montant | number:'1.0-0' }} XAF</span>
+          </td>
+          <td class="px-6 py-4 text-sm text-gray-500">{{ dep.enregistreParNom || '—' }}</td>
+          <td class="px-6 py-4 text-right">
+            <div class="flex justify-end gap-2">
+              <button (click)="openEditModal(dep)"
+                class="p-2 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+                <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
+                </svg>
+              </button>
+              <button (click)="delete(dep)"
+                class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+              </button>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="depenses.length === 0">
+          <td colspan="7" class="px-6 py-16 text-center text-gray-400">
+            <svg class="mx-auto h-12 w-12 mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+            </svg>
+            Aucune dépense trouvée
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="totalPages > 1" class="mt-6 flex justify-center">
+    <nav class="inline-flex rounded-md shadow-sm -space-x-px">
+      <button [disabled]="currentPage === 0" (click)="onPageChange(currentPage - 1)"
+        class="px-4 py-2 rounded-l-md border border-gray-300 bg-white text-sm text-gray-500 hover:bg-gray-50 disabled:opacity-50">←</button>
+      <span class="px-4 py-2 border border-gray-300 bg-white text-sm text-gray-700">
+        {{ currentPage + 1 }} / {{ totalPages }}
+      </span>
+      <button [disabled]="currentPage === totalPages - 1" (click)="onPageChange(currentPage + 1)"
+        class="px-4 py-2 rounded-r-md border border-gray-300 bg-white text-sm text-gray-500 hover:bg-gray-50 disabled:opacity-50">→</button>
+    </nav>
+  </div>
+</div>
+
+<!-- Modal Dépense -->
+<div *ngIf="showModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
+    <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
+      <h3 class="text-xl font-bold text-gray-900">
+        {{ modalMode === 'create' ? 'Nouvelle Dépense' : 'Modifier la Dépense' }}
+      </h3>
+      <button (click)="closeModal()" class="text-gray-400 hover:text-gray-600">
+        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    <form (ngSubmit)="onSubmit()" class="p-6 space-y-4">
+
+      <!-- Description -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Description <span class="text-red-500">*</span>
+        </label>
+        <input type="text" [(ngModel)]="formData.description" name="description" required
+          style="padding: 0.75rem 1rem;"
+          placeholder="Ex: Paiement loyer janvier"
+          class="w-full border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-gray-50"/>
+      </div>
+
+      <!-- Montant + Date -->
+      <div class="grid grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Montant (XAF) <span class="text-red-500">*</span>
+          </label>
+          <input type="number" [(ngModel)]="formData.montant" name="montant" required min="1"
+            style="padding: 0.75rem 1rem;"
+            class="w-full border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-gray-50"/>
+        </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">
+            Date <span class="text-red-500">*</span>
+          </label>
+          <input type="date" [(ngModel)]="formData.dateDepense" name="dateDepense" required
+            style="padding: 0.75rem 1rem;"
+            class="w-full border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-gray-50"/>
+        </div>
+      </div>
+
+      <!-- Catégorie -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Catégorie <span class="text-red-500">*</span>
+        </label>
+        <select [(ngModel)]="formData.categorieId" name="categorieId" required
+          style="padding: 0.75rem 1rem;"
+          class="w-full border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-gray-50">
+          <option value="">-- Sélectionnez une catégorie --</option>
+          <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.nom }}</option>
+        </select>
+      </div>
+
+      <!-- Référence -->
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-1">
+          Référence <span class="text-gray-400 text-xs">(optionnel)</span>
+        </label>
+        <input type="text" [(ngModel)]="formData.reference" name="reference"
+          style="padding: 0.75rem 1rem;"
+          placeholder="Ex: Facture n°123, Reçu..."
+          class="w-full border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-sm bg-gray-50"/>
+      </div>
+
+      <!-- Footer -->
+      <div class="flex justify-end gap-3 pt-2">
+        <button type="button" (click)="closeModal()" style="padding: 0.75rem 1rem;"
+          class="px-5 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 text-sm font-medium">
+          Annuler
+        </button>
+        <button type="submit" [disabled]="modalLoading" style="padding: 0.75rem 1rem;"
+          class="inline-flex items-center px-5 py-2.5 bg-indigo-600 text-white font-medium rounded-xl hover:bg-indigo-700 disabled:opacity-50 text-sm">
+          <svg *ngIf="modalLoading" class="animate-spin h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+          </svg>
+          {{ modalLoading ? 'Enregistrement...' : 'Enregistrer' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

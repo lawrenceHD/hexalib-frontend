@@ -47,6 +47,14 @@ export const routes: Routes = [
   canActivate: [authGuard]
 },
 
+{
+  path: 'comptabilite',
+  canActivate: [authGuard],
+  loadChildren: () =>
+    import('./features/comptabilite/comptabilite-routing-module')
+      .then(m => m.ComptabiliteRoutingModule)
+},
+
       // ── Rapports (admin uniquement) ───────────────────────────────────────
       {
         path:        'rapports',
