@@ -1,7 +1,7 @@
-<div class="p-4 sm:p-6 lg:p-8 min-h-screen bg-gray-50 antialiased">
+<div class="p-4 sm:p-6 lg:p-8 min-h-screen bg-gray-50 antialiased" style="margin:5px;padding:5px">
 
   <!-- En-tête -->
-  <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+  <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4" style="margin:5px;padding:5px">
     <div>
       <h1 class="text-3xl font-bold text-gray-900">Gestion des Dépenses</h1>
       <p class="mt-1 text-sm text-gray-500">{{ totalElements }} dépense(s) au total</p>
@@ -24,30 +24,34 @@
   </div>
 
   <!-- Filtres -->
-  <div class="mb-6 flex flex-wrap gap-3" style="margin:5px;padding:5px">
+  <div style="margin:5px;padding:5px" class="mb-6 flex flex-wrap gap-3" style="margin:5px;padding:5px">
     <select [(ngModel)]="selectedCategorieId" (change)="onFilterChange()"
+    style="margin:5px;padding:5px"
       class="px-4 py-2 border border-gray-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500">
       <option value="">Toutes les catégories</option>
       <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.nom }}</option>
     </select>
     <input type="date" [(ngModel)]="debut" (change)="onFilterChange()"
+    style="margin:5px;padding:5px"
       class="px-4 py-2 border border-gray-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
     <input type="date" [(ngModel)]="fin" (change)="onFilterChange()"
+    style="margin:5px;padding:5px"
       class="px-4 py-2 border border-gray-200 rounded-lg bg-white text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
     <button (click)="resetFilters()"
+    style="margin:5px;padding:5px"
       class="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg text-sm font-medium transition-colors">
       Réinitialiser
     </button>
   </div>
 
   <!-- Loader -->
-  <div *ngIf="loading" class="flex justify-center items-center py-32">
+  <div style="margin:5px;padding:5px" *ngIf="loading" class="flex justify-center items-center py-32">
     <div class="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 border-t-indigo-600"></div>
   </div>
 
   <!-- Tableau -->
-  <div *ngIf="!loading" class="bg-white rounded-lg shadow-sm overflow-hidden" style="margin:5px;padding:5px">
-    <table class="w-full min-w-max table-auto">
+  <div style="margin:5px;padding:5px" *ngIf="!loading" class="bg-white rounded-lg shadow-sm overflow-hidden" style="margin:5px;padding:5px">
+    <table style="margin:5px;padding:5px" class="w-full min-w-max table-auto">
       <thead class="border-b border-gray-100">
         <tr>
           <th class="px-6 py-4 text-left text-xs font-bold uppercase tracking-wider text-gray-600">Date</th>
@@ -105,7 +109,7 @@
   </div>
 
   <!-- Pagination -->
-  <div *ngIf="totalPages > 1" class="mt-6 flex justify-center">
+  <div style="margin:5px;padding:5px" *ngIf="totalPages > 1" class="mt-6 flex justify-center">
     <nav class="inline-flex rounded-md shadow-sm -space-x-px">
       <button [disabled]="currentPage === 0" (click)="onPageChange(currentPage - 1)"
         class="px-4 py-2 rounded-l-md border border-gray-300 bg-white text-sm text-gray-500 hover:bg-gray-50 disabled:opacity-50">←</button>
@@ -119,8 +123,8 @@
 </div>
 
 <!-- Modal Dépense -->
-<div *ngIf="showModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
+<div style="margin:5px;padding:5px" *ngIf="showModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+  <div style="margin:5px;padding:5px" class="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
     <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
       <h3 class="text-xl font-bold text-gray-900">
         {{ modalMode === 'create' ? 'Nouvelle Dépense' : 'Modifier la Dépense' }}
@@ -145,7 +149,7 @@
       </div>
 
       <!-- Montant + Date -->
-      <div class="grid grid-cols-2 gap-4">
+      <div style="margin:5px;padding:5px" class="grid grid-cols-2 gap-4">
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-1">
             Montant (XAF) <span class="text-red-500">*</span>
@@ -189,7 +193,7 @@
       </div>
 
       <!-- Footer -->
-      <div class="flex justify-end gap-3 pt-2">
+      <div style="margin:5px;padding:5px" class="flex justify-end gap-3 pt-2">
         <button type="button" (click)="closeModal()" style="padding: 0.75rem 1rem;"
           class="px-5 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-xl hover:bg-gray-50 text-sm font-medium">
           Annuler

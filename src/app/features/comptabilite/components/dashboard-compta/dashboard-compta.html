@@ -1,13 +1,13 @@
-<div class="p-4 sm:p-6 lg:p-8 min-h-screen bg-gray-50 antialiased">
+<div class="p-4 sm:p-6 lg:p-8 min-h-screen bg-gray-50 antialiased" style="margin:5px;padding:5px">
 
   <!-- En-tête -->
-  <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+  <div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4" style="margin:5px;padding:5px">
     <div>
       <h1 class="text-3xl font-bold text-gray-900">Tableau de Bord Comptable</h1>
       <p class="mt-1 text-sm text-gray-500">Vue d'ensemble des finances</p>
     </div>
     <!-- Sélecteur période -->
-    <div class="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-4 py-2 shadow-sm">
+    <div style="margin:5px;padding:5px" class="flex items-center gap-3 bg-white border border-gray-200 rounded-xl px-4 py-2 shadow-sm">
       <input type="date" [(ngModel)]="debut" (change)="onPeriodeChange()"
         class="text-sm border-none outline-none bg-transparent text-gray-700"/>
       <span class="text-gray-400">→</span>
@@ -17,17 +17,17 @@
   </div>
 
   <!-- Loader -->
-  <div *ngIf="loading" class="flex justify-center items-center py-32">
+  <div style="margin:5px;padding:5px" *ngIf="loading" class="flex justify-center items-center py-32">
     <div class="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 border-t-indigo-600"></div>
   </div>
 
-  <div *ngIf="!loading && dashboard">
+  <div style="margin:5px;padding:5px" *ngIf="!loading && dashboard">
 
     <!-- KPIs -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+    <div style="margin:5px;padding:5px" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
 
       <!-- Entrées -->
-      <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+      <div style="margin:5px;padding:5px" class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
         <div class="flex items-center justify-between mb-3">
           <p class="text-sm font-medium text-gray-500">Total Entrées</p>
           <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center">
@@ -41,7 +41,7 @@
       </div>
 
       <!-- Sorties -->
-      <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+      <div style="margin:5px;padding:5px" class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
         <div class="flex items-center justify-between mb-3">
           <p class="text-sm font-medium text-gray-500">Total Sorties</p>
           <div class="w-10 h-10 bg-red-100 rounded-xl flex items-center justify-center">
@@ -55,7 +55,7 @@
       </div>
 
       <!-- Solde -->
-      <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+      <div style="margin:5px;padding:5px" class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
         <div class="flex items-center justify-between mb-3">
           <p class="text-sm font-medium text-gray-500">Solde Net</p>
           <div class="w-10 h-10 rounded-xl flex items-center justify-center"
@@ -80,7 +80,7 @@
       </div>
 
       <!-- Réductions -->
-      <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+      <div style="margin:5px;padding:5px" class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
         <div class="flex items-center justify-between mb-3">
           <p class="text-sm font-medium text-gray-500">Réductions Accordées</p>
           <div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center">
@@ -96,25 +96,25 @@
     </div>
 
     <!-- Répartition dépenses + Top 5 -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+    <div style="margin:5px;padding:5px" class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
 
       <!-- Répartition par catégorie -->
-      <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+      <div style="margin:5px;padding:5px" class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
         <h2 class="text-lg font-semibold text-gray-900 mb-5">Dépenses par Catégorie</h2>
         <div *ngIf="dashboard.depensesParCategorie.length === 0" class="text-center py-8 text-gray-400">
           Aucune dépense sur cette période
         </div>
-        <div class="space-y-4">
+        <div style="margin:5px;padding:5px" class="space-y-4">
           <div *ngFor="let cat of dashboard.depensesParCategorie">
             <div class="flex items-center justify-between mb-1">
               <span class="text-sm font-medium text-gray-700">{{ cat.categorieNom }}</span>
               <span class="text-sm font-bold text-gray-900">{{ cat.montant | number:'1.0-0' }} XAF</span>
             </div>
-            <div class="w-full bg-gray-100 rounded-full h-2">
+            <div style="margin:5px;padding:5px" class="w-full bg-gray-100 rounded-full h-2">
               <div class="bg-indigo-500 h-2 rounded-full transition-all duration-500"
                 [style.width]="getBarWidth(cat.pourcentage)"></div>
             </div>
-            <div class="flex justify-between mt-0.5">
+            <div style="margin:5px;padding:5px" class="flex justify-between mt-0.5">
               <span class="text-xs text-gray-400">{{ cat.nombreDepenses }} dépense(s)</span>
               <span class="text-xs text-gray-500">{{ cat.pourcentage | number:'1.1-1' }}%</span>
             </div>
@@ -123,12 +123,12 @@
       </div>
 
       <!-- Top 5 catégories -->
-      <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+      <div style="margin:5px;padding:5px" class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
         <h2 class="text-lg font-semibold text-gray-900 mb-5">Top 5 Catégories de Dépenses</h2>
         <div *ngIf="dashboard.top5Categories.length === 0" class="text-center py-8 text-gray-400">
           Aucune dépense sur cette période
         </div>
-        <div class="space-y-3">
+        <div style="margin:5px;padding:5px" class="space-y-3">
           <div *ngFor="let cat of dashboard.top5Categories; let i = index"
             class="flex items-center gap-4 p-3 rounded-xl bg-gray-50">
             <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold text-white shrink-0"
@@ -138,7 +138,7 @@
               [class.bg-gray-400]="i >= 3">
               {{ i + 1 }}
             </div>
-            <div class="flex-1 min-w-0">
+            <div style="margin:5px;padding:5px" class="flex-1 min-w-0">
               <p class="text-sm font-semibold text-gray-900 truncate">{{ cat.categorieNom }}</p>
               <p class="text-xs text-gray-400">{{ cat.nombreDepenses }} dépense(s)</p>
             </div>
@@ -152,9 +152,9 @@
     </div>
 
     <!-- Raccourcis rapports -->
-    <div class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
+    <div style="margin:5px;padding:5px" class="bg-white rounded-2xl shadow-sm p-6 border border-gray-100">
       <h2 class="text-lg font-semibold text-gray-900 mb-5">Accès Rapides aux Rapports</h2>
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div style="margin:5px;padding:5px" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         <a routerLink="/comptabilite/rapport-ventes"
           class="flex flex-col items-center p-4 rounded-xl bg-blue-50 hover:bg-blue-100 transition-colors cursor-pointer">
           <svg class="w-8 h-8 text-blue-600 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

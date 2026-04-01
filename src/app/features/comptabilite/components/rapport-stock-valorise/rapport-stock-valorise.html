@@ -1,4 +1,4 @@
-<div class="p-4 sm:p-6 lg:p-8 min-h-screen bg-gray-50 antialiased">
+<div class="p-4 sm:p-6 lg:p-8 min-h-screen bg-gray-50 antialiased" style="margin:5px;padding:5px">
   <div class="mb-8 flex items-center justify-between">
     <div>
       <h1 class="text-3xl font-bold text-gray-900">Stock Valorisé</h1>
@@ -15,38 +15,38 @@
     </button>
   </div>
 
-  <div *ngIf="loading" class="flex justify-center items-center py-32">
+  <div style="margin:5px;padding:5px" *ngIf="loading" class="flex justify-center items-center py-32">
     <div class="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 border-t-indigo-600"></div>
   </div>
 
   <div *ngIf="!loading && rapport" class="space-y-6">
 
     <!-- KPIs -->
-    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
-      <div class="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
+    <div style="margin:5px;padding:5px" class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div style="margin:5px;padding:5px" class="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
         <p class="text-xs text-gray-500 mb-1">Valeur Stock Total</p>
         <p class="text-xl font-bold text-indigo-600">{{ rapport.valeurTotaleStockPrixVente | number:'1.0-0' }} XAF</p>
       </div>
-      <div class="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
+      <div style="margin:5px;padding:5px" class="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
         <p class="text-xs text-gray-500 mb-1">Titres au catalogue</p>
         <p class="text-xl font-bold text-gray-900">{{ rapport.totalLivresEnStock }}</p>
       </div>
-      <div class="bg-white rounded-xl shadow-sm p-5 border border-orange-200">
+      <div style="margin:5px;padding:5px" class="bg-white rounded-xl shadow-sm p-5 border border-orange-200">
         <p class="text-xs text-gray-500 mb-1">Stock Critique</p>
         <p class="text-xl font-bold text-orange-600">{{ rapport.totalLivresCritiques }}</p>
       </div>
-      <div class="bg-white rounded-xl shadow-sm p-5 border border-red-200">
+      <div style="margin:5px;padding:5px" class="bg-white rounded-xl shadow-sm p-5 border border-red-200">
         <p class="text-xs text-gray-500 mb-1">En Rupture</p>
         <p class="text-xl font-bold text-red-600">{{ rapport.totalLivresEnRupture }}</p>
       </div>
     </div>
 
     <!-- Stock par catégorie -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+    <div style="margin:5px;padding:5px" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
       <div class="px-6 py-4 border-b border-gray-100">
         <h2 class="text-lg font-semibold text-gray-900">Valorisation par Catégorie</h2>
       </div>
-      <table class="w-full">
+      <table style="margin:5px;padding:5px" class="w-full">
         <thead class="bg-gray-50 border-b border-gray-100">
           <tr>
             <th class="px-5 py-3 text-left text-xs font-bold uppercase text-gray-600">Catégorie</th>
@@ -70,11 +70,11 @@
     </div>
 
     <!-- Livres en rupture -->
-    <div *ngIf="rapport.livresEnRupture.length > 0" class="bg-white rounded-xl shadow-sm border border-red-200 overflow-hidden">
+    <div style="margin:5px;padding:5px" *ngIf="rapport.livresEnRupture.length > 0" class="bg-white rounded-xl shadow-sm border border-red-200 overflow-hidden">
       <div class="px-6 py-4 border-b border-red-100 bg-red-50">
         <h2 class="text-lg font-semibold text-red-700">⚠ Livres en Rupture de Stock ({{ rapport.livresEnRupture.length }})</h2>
       </div>
-      <table class="w-full">
+      <table style="margin:5px;padding:5px" class="w-full">
         <thead class="bg-red-50 border-b border-red-100">
           <tr>
             <th class="px-5 py-3 text-left text-xs font-bold uppercase text-red-600">Code</th>
@@ -97,11 +97,11 @@
     </div>
 
     <!-- Livres critiques -->
-    <div *ngIf="rapport.livresCritiques.length > 0" class="bg-white rounded-xl shadow-sm border border-orange-200 overflow-hidden">
+    <div style="margin:5px;padding:5px" *ngIf="rapport.livresCritiques.length > 0" class="bg-white rounded-xl shadow-sm border border-orange-200 overflow-hidden">
       <div class="px-6 py-4 border-b border-orange-100 bg-orange-50">
         <h2 class="text-lg font-semibold text-orange-700">⚡ Livres en Stock Critique ({{ rapport.livresCritiques.length }})</h2>
       </div>
-      <table class="w-full">
+      <table style="margin:5px;padding:5px" class="w-full">
         <thead class="bg-orange-50 border-b border-orange-100">
           <tr>
             <th class="px-5 py-3 text-left text-xs font-bold uppercase text-orange-600">Code</th>

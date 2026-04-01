@@ -1,5 +1,5 @@
-<div class="p-4 sm:p-6 lg:p-8 min-h-screen bg-gray-50 antialiased">
-  <div class="mb-8 flex items-center justify-between">
+<div class="p-4 sm:p-6 lg:p-8 min-h-screen bg-gray-50 antialiased" style="margin:5px;padding:5px">
+  <div class="mb-8 flex items-center justify-between" style="margin:5px;padding:5px">
     <div>
       <h1 class="text-3xl font-bold text-gray-900">Catégories de Dépenses</h1>
       <p class="mt-1 text-sm text-gray-500">{{ categories.length }} catégorie(s)</p>
@@ -13,11 +13,11 @@
     </button>
   </div>
 
-  <div *ngIf="loading" class="flex justify-center py-32">
+  <div *ngIf="loading" class="flex justify-center py-32" style="margin:5px;padding:5px">
     <div class="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 border-t-indigo-600"></div>
   </div>
 
-  <div *ngIf="!loading" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+  <div style="margin:5px;padding:5px" *ngIf="!loading" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
     <table class="w-full">
       <thead class="border-b border-gray-100 bg-gray-50">
         <tr>
@@ -73,8 +73,8 @@
 </div>
 
 <!-- Modal -->
-<div *ngIf="showModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+<div style="margin:5px;padding:5px" *ngIf="showModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md" style="margin:5px;padding:5px">
     <div class="px-6 py-5 border-b border-gray-100 flex items-center justify-between">
       <h3 class="text-xl font-bold text-gray-900">
         {{ modalMode === 'create' ? 'Nouvelle Catégorie' : 'Modifier' }}
