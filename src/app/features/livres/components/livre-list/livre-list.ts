@@ -11,11 +11,12 @@ import { Livre, PageResponse } from '../../models/livre.model';
 import { Categorie } from '../../../../core/models/categorie.model';
 import { AuthService } from '../../../../core/services/auth';
 import { ImportResultResponse } from '../../models/livre.model';
+import { LivreImportComponent } from '../livre-import/livre-import';
 
 @Component({
   selector: 'app-livre-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule,LivreImportComponent],
   templateUrl: './livre-list.html',
   styleUrl: './livre-list.css'
 })
@@ -24,6 +25,7 @@ export class LivreListComponent implements OnInit {
   categories: Categorie[] = [];
   langues: string[] = [];
   loading = false;
+  showImport = false;
   
   // Filtres
   searchTerm = '';
