@@ -1,0 +1,111 @@
+<!-- ════════════════════════════════════════════════════
+     rapport-compte-resultat.component.html
+     ════════════════════════════════════════════════════ -->
+<div class="p-4 sm:p-6 lg:p-8 min-h-screen bg-gray-50 antialiased" style="margin:5px;padding:5px">
+  <div style="margin:5px;padding:5px" class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-4">Compte de Résultat</h1>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex flex-wrap gap-4 items-end">
+      <div style="margin:5px;padding:5px">
+        <label class="block text-xs font-medium text-gray-500 mb-1">Du</label>
+        <input type="date" [(ngModel)]="debut" style="padding: 0.625rem 1rem;"
+          class="border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+      </div>
+      <div style="margin:5px;padding:5px">
+        <label class="block text-xs font-medium text-gray-500 mb-1">Au</label>
+        <input type="date" [(ngModel)]="fin" style="padding: 0.625rem 1rem;"
+          class="border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+      </div>
+      <div style="margin:5px;padding:5px">
+      <button (click)="generer()" style="padding: 0.625rem 1.25rem;"
+      style="margin:5px;padding:5px"
+        class="inline-flex items-center bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg text-sm transition-colors">
+        Générer
+      </button>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin:5px;padding:5px" *ngIf="loading" class="flex justify-center items-center py-32">
+    <div class="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 border-t-indigo-600"></div>
+  </div>
+
+  <div style="margin:5px;padding:5px" *ngIf="!loading && rapport" class="space-y-6">
+
+    <!-- Résultat net en haut -->
+    <div style="margin:5px;padding:5px" class="rounded-2xl p-6 text-center shadow-sm"
+      [class.bg-green-600]="rapport.beneficiaire"
+      [class.bg-red-600]="!rapport.beneficiaire">
+      <p class="text-white/80 text-sm font-medium mb-1">RÉSULTAT NET</p>
+      <p class="text-4xl font-bold text-white">{{ rapport.resultatNet | number:'1.0-0' }} XAF</p>
+      <p class="text-white/80 text-sm mt-2">
+        {{ rapport.beneficiaire ? '✅ Bénéficiaire' : '❌ Déficitaire' }}
+      </p>
+    </div>
+
+    <!-- Produits / Charges -->
+    <div style="margin:5px;padding:5px" class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+
+      <!-- Produits (Entrées) -->
+      <div style="margin:5px;padding:5px" class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-green-500"></span> PRODUITS
+        </h2>
+        <dl class="space-y-3">
+          <div class="flex justify-between">
+            <dt class="text-sm text-gray-600">CA Ventes brut</dt>
+            <dd class="text-sm font-semibold text-gray-900">{{ rapport.caVentes | number:'1.0-0' }} XAF</dd>
+          </div>
+          <div style="margin:5px;padding:5px" class="flex justify-between text-orange-600">
+            <dt class="text-sm">- Réductions accordées</dt>
+            <dd class="text-sm font-semibold">-{{ rapport.totalReductionsAccordees | number:'1.0-0' }} XAF</dd>
+          </div>
+          <div style="margin:5px;padding:5px" class="flex justify-between pt-3 border-t border-gray-200">
+            <dt class="text-sm font-bold text-gray-900">CA Net</dt>
+            <dd class="text-sm font-bold text-green-600">{{ rapport.caNet | number:'1.0-0' }} XAF</dd>
+          </div>
+        </dl>
+      </div>
+
+      <!-- Charges (Dépenses) -->
+      <div style="margin:5px;padding:5px" class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+          <span class="w-3 h-3 rounded-full bg-red-500"></span> CHARGES
+        </h2>
+        <dl class="space-y-3">
+          <div style="margin:5px;padding:5px" *ngFor="let charge of rapport.chargesParCategorie" class="flex justify-between">
+            <dt class="text-sm text-gray-600">{{ charge.categorieNom }}</dt>
+            <dd class="text-sm font-semibold text-gray-900">{{ charge.montant | number:'1.0-0' }} XAF</dd>
+          </div>
+          <div style="margin:5px;padding:5px" class="flex justify-between pt-3 border-t border-gray-200">
+            <dt class="text-sm font-bold text-gray-900">Total Charges</dt>
+            <dd class="text-sm font-bold text-red-600">{{ rapport.totalCharges | number:'1.0-0' }} XAF</dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+
+    <!-- Répartition charges par catégorie -->
+    <div style="margin:5px;padding:5px" class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-5">Répartition des Charges</h2>
+      <div class="space-y-4">
+        <div style="margin:5px;padding:5px" *ngFor="let charge of rapport.chargesParCategorie">
+          <div class="flex justify-between mb-1">
+            <span class="text-sm font-medium text-gray-700">{{ charge.categorieNom }}</span>
+            <div class="text-right">
+              <span class="text-sm font-bold text-gray-900">{{ charge.montant | number:'1.0-0' }} XAF</span>
+              <span class="text-xs text-gray-400 ml-2">{{ charge.pourcentageDesCharges | number:'1.1-1' }}%</span>
+            </div>
+          </div>
+          <div style="margin:5px;padding:5px" class="w-full bg-gray-100 rounded-full h-2">
+            <div class="bg-red-400 h-2 rounded-full transition-all duration-500"
+              [style.width]="getBarWidth(charge.pourcentageDesCharges)"></div>
+          </div>
+          <p class="text-xs text-gray-400 mt-0.5">{{ charge.nombreDepenses }} dépense(s)</p>
+        </div>
+        <div *ngIf="rapport.chargesParCategorie.length === 0" class="text-center py-8 text-gray-400">
+          Aucune charge sur cette période
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

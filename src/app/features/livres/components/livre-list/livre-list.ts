@@ -10,11 +10,13 @@ import { CategorieService } from '../../../categories/services/categorie';
 import { Livre, PageResponse } from '../../models/livre.model';
 import { Categorie } from '../../../../core/models/categorie.model';
 import { AuthService } from '../../../../core/services/auth';
+import { ImportResultResponse } from '../../models/livre.model';
+import { LivreImportComponent } from '../livre-import/livre-import';
 
 @Component({
   selector: 'app-livre-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule,LivreImportComponent],
   templateUrl: './livre-list.html',
   styleUrl: './livre-list.css'
 })
@@ -23,6 +25,7 @@ export class LivreListComponent implements OnInit {
   categories: Categorie[] = [];
   langues: string[] = [];
   loading = false;
+  showImport = false;
   
   // Filtres
   searchTerm = '';
@@ -359,4 +362,92 @@ export class LivreListComponent implements OnInit {
   get pages(): number[] {
     return Array(this.totalPages).fill(0).map((x, i) => i);
   }
+
+  // Modal import
+showImportModal = false;
+importCategorieId = '';
+importFile: File | null = null;
+importLoading = false;
+ 
+// Modal résultat import
+showImportResultModal = false;
+importResult: ImportResultResponse | null = null;
+ 
+// ── Méthodes à ajouter ──
+ 
+openImportModal(): void {
+  this.importCategorieId = '';
+  this.importFile = null;
+  this.showImportModal = true;
+}
+ 
+closeImportModal(): void {
+  this.showImportModal = false;
+  this.importCategorieId = '';
+  this.importFile = null;
+}
+ 
+onFileSelected(event: Event): void {
+  const input = event.target as HTMLInputElement;
+  if (input.files && input.files.length > 0) {
+    const file = input.files[0];
+    const allowed = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                     'application/vnd.ms-excel'];
+    if (!allowed.includes(file.type) && !file.name.endsWith('.xlsx') && !file.name.endsWith('.xls')) {
+      this.toastr.error('Veuillez sélectionner un fichier Excel (.xlsx ou .xls)', 'Format invalide');
+      input.value = '';
+      return;
+    }
+    this.importFile = file;
+  }
+}
+ 
+lancerImport(): void {
+  if (!this.importCategorieId) {
+    this.toastr.warning('Veuillez sélectionner une catégorie', 'Validation');
+    return;
+  }
+  if (!this.importFile) {
+    this.toastr.warning('Veuillez sélectionner un fichier Excel', 'Validation');
+    return;
+  }
+ 
+  this.importLoading = true;
+  this.livreService.importLivres(this.importFile, this.importCategorieId).subscribe({
+    next: (response) => {
+      this.importResult = response.data;
+      this.importLoading = false;
+      this.closeImportModal();
+      this.showImportResultModal = true; // Afficher le résultat
+      this.loadLivres(); // Recharger la liste
+    },
+    error: (error) => {
+      this.toastr.error(error.message || 'Erreur lors de l\'import', 'Erreur');
+      this.importLoading = false;
+    }
+  });
+}
+ 
+closeImportResultModal(): void {
+  this.showImportResultModal = false;
+  this.importResult = null;
+}
+ 
+exporterLivres(): void {
+  this.livreService.exportLivres().subscribe({
+    next: (blob) => {
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+      link.download = `Inventaire_Hexalib_${date}.xlsx`;
+      link.click();
+      window.URL.revokeObjectURL(url);
+      this.toastr.success('Export téléchargé avec succès', 'Export');
+    },
+    error: () => {
+      this.toastr.error('Erreur lors de l\'export', 'Erreur');
+    }
+  });
+}
 }

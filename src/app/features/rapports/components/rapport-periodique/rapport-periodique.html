@@ -1,0 +1,314 @@
+<div *ngIf="rapport" class="p-4 sm:p-6">
+
+  <!-- Titre -->
+  <div class="flex items-center gap-4 mb-6">
+    <div class="w-12 h-12 rounded-xl bg-indigo-100 flex items-center justify-center flex-shrink-0">
+      <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+      </svg>
+    </div>
+    <div>
+      <h2 class="text-xl font-bold text-gray-900">Rapport {{ getPeriodeLabel() }}</h2>
+      <p class="text-sm text-gray-500">{{ formatDate(rapport.dateDebut) }} — {{ formatDate(rapport.dateFin) }}</p>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+    <div class="kpi-card kpi-card--indigo">
+      <div class="kpi-icon kpi-icon--indigo">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        </svg>
+      </div>
+      <div>
+        <p class="kpi-label">Nombre de ventes</p>
+        <p class="kpi-value">{{ rapport.nombreVentes }}</p>
+      </div>
+    </div>
+
+    <div class="kpi-card kpi-card--green">
+      <div class="kpi-icon kpi-icon--green">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+        </svg>
+      </div>
+      <div>
+        <p class="kpi-label">Chiffre d'affaires</p>
+        <p class="kpi-value">{{ formatCurrency(rapport.chiffreAffaires) }}</p>
+      </div>
+    </div>
+
+    <div class="kpi-card kpi-card--orange">
+      <div class="kpi-icon kpi-icon--orange">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+        </svg>
+      </div>
+      <div>
+        <p class="kpi-label">Réductions</p>
+        <p class="kpi-value">{{ formatCurrency(rapport.montantReductions) }}</p>
+      </div>
+    </div>
+
+    <div class="kpi-card kpi-card--purple">
+      <div class="kpi-icon kpi-icon--purple">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+        </svg>
+      </div>
+      <div>
+        <p class="kpi-label">Livres vendus</p>
+        <p class="kpi-value">{{ rapport.nombreLivresVendus }}</p>
+      </div>
+    </div>
+
+    <div *ngIf="rapport.margeBeneficiaire" class="kpi-card kpi-card--green">
+      <div class="kpi-icon kpi-icon--green">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
+        </svg>
+      </div>
+      <div>
+        <p class="kpi-label">Marge bénéficiaire</p>
+        <p class="kpi-value">{{ formatCurrency(rapport.margeBeneficiaire) }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Comparaison période précédente -->
+  <div *ngIf="rapport.evolutionCA !== null" class="section-card mb-4">
+    <div class="section-header">
+      <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/>
+      </svg>
+      <h3 class="section-title">Comparaison — Période précédente</h3>
+    </div>
+    <div class="flex flex-wrap gap-8 p-5">
+      <div class="flex flex-col gap-2">
+        <span class="text-sm text-gray-500 font-medium">Évolution CA</span>
+        <span [class]="getEvolutionClass(rapport.evolutionCA)">
+          {{ getEvolutionArrow(rapport.evolutionCA) }}
+          {{ getEvolutionSign(rapport.evolutionCA) }}{{ rapport.evolutionCA | number:'1.1-1' }}%
+        </span>
+      </div>
+      <div class="flex flex-col gap-2">
+        <span class="text-sm text-gray-500 font-medium">Évolution ventes</span>
+        <span [class]="getEvolutionClass(rapport.evolutionNombreVentes)">
+          {{ getEvolutionArrow(rapport.evolutionNombreVentes) }}
+          {{ getEvolutionSign(rapport.evolutionNombreVentes) }}{{ rapport.evolutionNombreVentes }}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Graphique CA (CSS bars — sans dépendance externe) -->
+  <div *ngIf="chartBars.length" class="section-card mb-4">
+    <div class="section-header">
+      <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+      </svg>
+      <h3 class="section-title">Évolution du Chiffre d'Affaires</h3>
+    </div>
+    <div class="chart-wrap p-5">
+      <div class="chart-bars">
+        <div *ngFor="let bar of chartBars" class="chart-bar-col">
+          <span class="chart-tooltip">{{ formatCurrencyShort(bar.value) }}</span>
+          <div class="chart-bar" [style.height.%]="bar.height || 2"></div>
+          <span class="chart-label">{{ bar.label }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Top 10 livres -->
+  <div *ngIf="rapport.topLivres?.length" class="section-card mb-4">
+    <div class="section-header">
+      <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+      </svg>
+      <h3 class="section-title">Top 10 Livres Vendus</h3>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="rapport-table">
+        <thead>
+          <tr>
+            <th>#</th><th>Code</th><th>Titre</th><th>Auteur</th>
+            <th>Catégorie</th><th>Qté</th><th>CA</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let l of rapport.topLivres" class="hover:bg-gray-50 transition-colors">
+            <td><span [class]="getRangClass(l.rang)">{{ l.rang }}</span></td>
+            <td><code class="code-tag">{{ l.code }}</code></td>
+            <td class="font-medium text-gray-900">{{ l.titre }}</td>
+            <td class="text-gray-500">{{ l.auteur }}</td>
+            <td>{{ l.categorie }}</td>
+            <td class="text-center font-semibold">{{ l.quantiteVendue }}</td>
+            <td class="font-semibold text-indigo-700">{{ formatCurrency(l.chiffreAffaires) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Top 5 catégories -->
+  <div *ngIf="rapport.topCategories?.length" class="section-card mb-4">
+    <div class="section-header">
+      <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+      </svg>
+      <h3 class="section-title">Top 5 Catégories</h3>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="rapport-table">
+        <thead>
+          <tr>
+            <th>#</th><th>Catégorie</th><th>Qté vendue</th><th>CA</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of rapport.topCategories" class="hover:bg-gray-50 transition-colors">
+            <td><span [class]="getRangClass(c.rang)">{{ c.rang }}</span></td>
+            <td class="font-medium text-gray-900">{{ c.nom }}</td>
+            <td class="text-center font-semibold">{{ c.quantiteVendue }}</td>
+            <td class="font-semibold text-indigo-700">{{ formatCurrency(c.chiffreAffaires) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Performance vendeurs -->
+  <div *ngIf="rapport.performanceVendeurs?.length" class="section-card mb-4">
+    <div class="section-header">
+      <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+      </svg>
+      <h3 class="section-title">Performance des Vendeurs</h3>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="rapport-table">
+        <thead>
+          <tr>
+            <th>#</th><th>Vendeur</th><th>Ventes</th>
+            <th>Livres</th><th>CA</th><th>Panier moyen</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let v of rapport.performanceVendeurs" class="hover:bg-gray-50 transition-colors">
+            <td><span [class]="getRangClass(v.rang)">{{ v.rang }}</span></td>
+            <td class="font-medium text-gray-900">{{ v.nomComplet }}</td>
+            <td class="text-center">{{ v.nombreVentes }}</td>
+            <td class="text-center">{{ v.nombreLivresVendus }}</td>
+            <td class="font-semibold text-indigo-700">{{ formatCurrency(v.chiffreAffaires) }}</td>
+            <td>{{ formatCurrency(v.panierMoyen) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Analyse réductions -->
+  <div *ngIf="rapport.analyseReductions" class="section-card mb-4">
+    <div class="section-header">
+      <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+      </svg>
+      <h3 class="section-title">Analyse des Réductions</h3>
+    </div>
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 p-4">
+      <div class="kpi-card kpi-card--orange">
+        <div class="kpi-icon kpi-icon--orange">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <div>
+          <p class="kpi-label">Total réductions</p>
+          <p class="kpi-value">{{ formatCurrency(rapport.analyseReductions.montantTotalReductions) }}</p>
+        </div>
+      </div>
+      <div class="kpi-card kpi-card--indigo">
+        <div class="kpi-icon kpi-icon--indigo">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+          </svg>
+        </div>
+        <div>
+          <p class="kpi-label">Ventes avec réduction</p>
+          <p class="kpi-value">
+            {{ rapport.analyseReductions.nombreVentesAvecReduction }}
+            <small class="text-sm font-normal text-gray-400">({{ rapport.analyseReductions.pourcentageVentesAvecReduction | number:'1.0-1' }}%)</small>
+          </p>
+        </div>
+      </div>
+      <div class="kpi-card kpi-card--purple">
+        <div class="kpi-icon kpi-icon--purple">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/>
+          </svg>
+        </div>
+        <div>
+          <p class="kpi-label">Réduction moyenne</p>
+          <p class="kpi-value">{{ formatCurrency(rapport.analyseReductions.reductionMoyenne) }}</p>
+        </div>
+      </div>
+      <div class="kpi-card kpi-card--red">
+        <div class="kpi-icon kpi-icon--red">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/>
+          </svg>
+        </div>
+        <div>
+          <p class="kpi-label">Réduction maximale</p>
+          <p class="kpi-value">{{ formatCurrency(rapport.analyseReductions.reductionMaximale) }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rotation stock -->
+  <div *ngIf="rapport.rotationStock?.length" class="section-card mb-4">
+    <div class="section-header">
+      <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+      </svg>
+      <h3 class="section-title">Rotation du Stock par Catégorie</h3>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="rapport-table">
+        <thead>
+          <tr>
+            <th>Catégorie</th><th>Qté vendue</th><th>Stock actuel</th><th>Taux rotation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let r of rapport.rotationStock" class="hover:bg-gray-50 transition-colors">
+            <td class="font-medium text-gray-900">{{ r.categorieNom }}</td>
+            <td class="text-center font-semibold">{{ r.quantiteVendue }}</td>
+            <td class="text-center">{{ r.stockActuel }}</td>
+            <td>
+              <span [class]="getRotationBadgeClass(r.tauxRotation)">
+                {{ r.tauxRotation | number:'1.1-1' }}%
+              </span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>

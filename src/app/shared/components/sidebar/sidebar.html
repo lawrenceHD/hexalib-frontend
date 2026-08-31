@@ -42,7 +42,7 @@
   <div class="p-4 border-b border-gray-200" style="margin:5px;padding:5px">
     <div class="flex items-center space-x-3">
       <div class="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-semibold text-lg shrink-0">
-        {{ (currentUser?.nomComplet || 'U')?.charAt(0)?.toUpperCase() }}
+        {{ (currentUser?.nomComplet || 'U').charAt(0).toUpperCase() }}
       </div>
       <div *ngIf="!(collapsed$ | async)" class="min-w-0">
         <p class="text-sm font-medium text-gray-900 truncate">
@@ -58,7 +58,7 @@
   <!-- Contenu menu -->
   <div class="flex-1 overflow-y-auto py-4" style="margin:5px;padding:5px">
     <ul class="flex flex-col space-y-1 px-3">
-      <li *ngFor="let item of filteredMenuItems">
+      <li *ngFor="let item of menuItems">
         <a
           [routerLink]="item.route"
           routerLinkActive="bg-gray-100 text-indigo-700 border-l-4 border-indigo-600"

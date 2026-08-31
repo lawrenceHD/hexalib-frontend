@@ -1,0 +1,326 @@
+<div class="p-4 sm:p-6 lg:p-8 min-h-screen bg-gray-50 antialiased" style="margin:5px;padding:5px">
+  <!-- En-tête -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Mouvements de Stock</h1>
+    <p class="mt-2 text-sm text-gray-600">{{ totalElements }} mouvement(s) au total</p>
+  </div>
+
+  <!-- Filtres + Bouton Ajustement -->
+  <div class="mb-6 space-y-4" style="margin:5px;padding:5px">
+    <div class="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
+      
+      <!-- Filtre Type -->
+      <select
+        [(ngModel)]="selectedType"
+        (change)="onFilterChange()"
+        class="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-sm"
+      >
+        <option value="">Tous les types</option>
+        <option [value]="TypeMouvement.ENTREE">Entrée</option>
+        <option [value]="TypeMouvement.SORTIE">Sortie</option>
+        <option [value]="TypeMouvement.AJUSTEMENT">Ajustement</option>
+        <option [value]="TypeMouvement.RETOUR">Retour</option>
+      </select>
+
+      <!-- Filtre Livre -->
+      <select
+        [(ngModel)]="selectedLivreId"
+        (change)="onFilterChange()"
+        class="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white text-sm"
+      >
+        <option value="">Tous les livres</option>
+        <option *ngFor="let livre of livres" [value]="livre.id">
+          {{ livre.titre }} ({{ livre.code }})
+        </option>
+      </select>
+
+      <!-- Bouton Reset -->
+      <button
+        (click)="resetFilters()"
+        class="px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors text-sm font-medium"
+      >
+        Réinitialiser
+      </button>
+
+      <!-- Bouton Ajustement Manuel (Admin) -->
+      <button
+        (click)="openAjustementModal()"
+        class="inline-flex items-center px-6 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg"
+      >
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+        </svg>
+        Ajustement Manuel
+      </button>
+    </div>
+  </div>
+
+  <!-- Loader -->
+  <div *ngIf="loading" class="flex justify-center items-center py-32">
+    <div class="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 border-t-indigo-600"></div>
+  </div>
+
+  <!-- Tableau -->
+  <div *ngIf="!loading" class="bg-white rounded-lg shadow-sm overflow-hidden" style="margin:5px;padding:5px">
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-max table-auto">
+        <thead class="border-b border-gray-100">
+          <tr>
+            <th class="px-6 py-4 text-left">
+              <p class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-600 opacity-80">
+                Date
+              </p>
+            </th>
+            <th class="px-6 py-4 text-left">
+              <p class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-600 opacity-80">
+                Livre
+              </p>
+            </th>
+            <th class="px-6 py-4 text-left">
+              <p class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-600 opacity-80">
+                Type
+              </p>
+            </th>
+            <th class="px-6 py-4 text-left">
+              <p class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-600 opacity-80">
+                Quantité
+              </p>
+            </th>
+            <th class="px-6 py-4 text-left">
+              <p class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-600 opacity-80">
+                Stock
+              </p>
+            </th>
+            <th class="px-6 py-4 text-left">
+              <p class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-600 opacity-80">
+                Motif
+              </p>
+            </th>
+            <th class="px-6 py-4 text-left">
+              <p class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-gray-600 opacity-80">
+                Utilisateur
+              </p>
+            </th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          <tr *ngFor="let mouvement of mouvements" class="hover:bg-gray-50 transition-colors">
+            <td class="px-6 py-5">
+              <p class="text-sm text-gray-900">{{ formatDate(mouvement.dateMouvement) }}</p>
+            </td>
+            <td class="px-6 py-5">
+              <p class="text-sm font-semibold text-gray-900">{{ mouvement.titreLivre }}</p>
+              <p class="text-xs text-gray-500 mt-1">{{ mouvement.codeLivre }}</p>
+            </td>
+            <td class="px-6 py-5">
+              <span
+                [class]="'inline-grid items-center font-bold uppercase whitespace-nowrap select-none py-1.5 px-3 text-xs rounded-xl ' + getTypeColor(mouvement.typeMouvement)"
+              >
+                {{ getTypeLabel(mouvement.typeMouvement) }}
+              </span>
+            </td>
+            <td class="px-6 py-5">
+              <span
+                [class]="'text-sm font-bold ' + (mouvement.quantite > 0 ? 'text-green-600' : 'text-red-600')"
+              >
+                {{ mouvement.quantite > 0 ? '+' : '' }}{{ mouvement.quantite }}
+              </span>
+            </td>
+            <td class="px-6 py-5">
+              <div class="text-sm">
+                <span class="text-gray-600">{{ mouvement.stockAvant }}</span>
+                <span class="text-gray-400 mx-2">→</span>
+                <span class="font-semibold text-gray-900">{{ mouvement.stockApres }}</span>
+              </div>
+            </td>
+            <td class="px-6 py-5">
+              <p class="text-sm text-gray-600">{{ mouvement.motif || '—' }}</p>
+              <p *ngIf="mouvement.reference" class="text-xs text-gray-500 mt-1">Réf: {{ mouvement.reference }}</p>
+            </td>
+            <td class="px-6 py-5">
+              <p class="text-sm text-gray-900">{{ mouvement.userName || '—' }}</p>
+            </td>
+          </tr>
+
+          <!-- Ligne vide -->
+          <tr *ngIf="mouvements.length === 0">
+            <td colspan="7" class="px-6 py-16 text-center">
+              <svg class="mx-auto h-16 w-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"/>
+              </svg>
+              <p class="mt-4 text-lg font-medium text-gray-900">Aucun mouvement trouvé</p>
+              <p class="mt-2 text-sm text-gray-500">Les mouvements de stock apparaîtront ici.</p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="totalPages > 1" class="mt-6 flex items-center justify-center">
+    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+      <button
+        [disabled]="currentPage === 0"
+        (click)="onPageChange(currentPage - 1)"
+        class="relative inline-flex items-center px-4 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/>
+        </svg>
+      </button>
+      
+      <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+        Page {{ currentPage + 1 }} sur {{ totalPages }}
+      </span>
+      
+      <button
+        [disabled]="currentPage === totalPages - 1"
+        (click)="onPageChange(currentPage + 1)"
+        class="relative inline-flex items-center px-4 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+      >
+        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+        </svg>
+      </button>
+    </nav>
+  </div>
+</div>
+
+<!-- ============================================ -->
+<!-- MODAL AJUSTEMENT MANUEL -->
+<!-- ============================================ -->
+<div *ngIf="showModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4" style="margin:5px;padding:5px">
+  <div class="relative bg-white rounded-lg shadow-xl max-w-md w-full">
+    <!-- Header -->
+    <div class="flex items-center justify-between p-6 border-b border-gray-200" style="margin:5px;padding:5px">
+      <h3 class="text-2xl font-bold text-gray-900">Ajustement Manuel</h3>
+      <button 
+        type="button" 
+        (click)="closeModal()" 
+        class="text-gray-400 hover:text-gray-600 transition-colors"
+      >
+        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+    
+    <!-- Form -->
+    <form (ngSubmit)="onSubmit()">
+      <div class="p-6 space-y-4">
+        
+        <!-- Livre -->
+        <div style="margin:5px;padding:5px">
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Livre <span class="text-red-500">*</span>
+          </label>
+          <select 
+          style="margin:5px;padding:5px"
+            [(ngModel)]="formData.livreId" 
+            name="livreId"
+            required
+            class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+          >
+            <option value="">Sélectionnez un livre</option>
+            <option *ngFor="let livre of livres" [value]="livre.id">
+              {{ livre.titre }} (Stock: {{ livre.quantiteStock }})
+            </option>
+          </select>
+        </div>
+
+        <!-- Type -->
+        <div style="margin:5px;padding:5px">
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Type <span class="text-red-500">*</span>
+          </label>
+          <select 
+          style="margin:5px;padding:5px"
+            [(ngModel)]="formData.typeMouvement" 
+            name="typeMouvement"
+            required
+            class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+          >
+            <option [value]="TypeMouvement.ENTREE">Entrée (Ajout de stock)</option>
+            <option [value]="TypeMouvement.AJUSTEMENT">Ajustement (Correction)</option>
+          </select>
+        </div>
+
+        <!-- Quantité -->
+        <div style="margin:5px;padding:5px">
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Quantité <span class="text-red-500">*</span>
+          </label>
+          <input 
+          style="margin:5px;padding:5px"
+            type="number" 
+            [(ngModel)]="formData.quantite" 
+            name="quantite" 
+            required
+            min="1"
+            placeholder="Ex: 10"
+            class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+          />
+          <p class="mt-1 text-xs text-gray-500">
+            Quantité à ajouter ou ajuster
+          </p>
+        </div>
+
+        <!-- Motif -->
+        <div style="margin:5px;padding:5px">
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Motif <span class="text-gray-400 text-xs">(optionnel)</span>
+          </label>
+          <input 
+          style="margin:5px;padding:5px"
+            type="text" 
+            [(ngModel)]="formData.motif" 
+            name="motif"
+            placeholder="Ex: Réapprovisionnement, Inventaire..."
+            class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+          />
+        </div>
+
+        <!-- Référence -->
+        <div style="margin:5px;padding:5px">
+          <label class="block text-sm font-medium text-gray-700 mb-2">
+            Référence <span class="text-gray-400 text-xs">(optionnel)</span>
+          </label>
+          <input 
+          style="margin:5px;padding:5px"
+            type="text" 
+            [(ngModel)]="formData.reference" 
+            name="reference"
+            placeholder="Ex: BL-2026-001"
+            class="block w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+          />
+        </div>
+
+      </div>
+      
+      <!-- Footer -->
+      <div class="flex items-center justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50" style="margin:5px;padding:5px">
+        <button 
+        style="margin:5px;padding:5px"
+          type="button" 
+          (click)="closeModal()" 
+          class="px-6 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium"
+        >
+          Annuler
+        </button>
+        <button 
+        style="margin:5px;padding:5px"
+          type="submit" 
+          [disabled]="modalLoading"
+          class="inline-flex items-center px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          <svg *ngIf="modalLoading" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+</svg>
+{{ modalLoading ? 'Enregistrement...' : 'Enregistrer' }}
+</button>
+</div>
+</form>
+  </div>
+</div>

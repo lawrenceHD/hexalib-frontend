@@ -1,0 +1,301 @@
+<div class="p-4 sm:p-6 lg:p-8 min-h-screen bg-gray-50 antialiased" style="margin:5px;padding:5px">
+
+  <!-- En-tête -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">
+      {{ authService.isAdmin() ? 'Historique des Ventes' : 'Mes Ventes' }}
+    </h1>
+    <p class="mt-2 text-sm text-gray-600">{{ totalElements }} vente(s) au total</p>
+  </div>
+
+  <!-- Barre de Recherche (Admin uniquement) + Bouton Point de Vente -->
+  <div class="mb-6" style="margin:5px;padding:5px">
+    <div class="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
+
+      <!-- Recherche — visible seulement pour l'admin -->
+      <div *ngIf="authService.isAdmin()" class="flex-1 max-w-lg">
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+            </svg>
+          </div>
+          <input
+            type="text"
+            [(ngModel)]="searchTerm"
+            (keyup.enter)="onSearch()"
+            placeholder="      Rechercher par numéro de facture ou vendeur..."
+            class="block w-full pl-11 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+          />
+        </div>
+      </div>
+
+      <!-- Bouton Point de Vente -->
+      <button
+        style="padding: 0.75rem 1rem;"
+        (click)="redirectToPointVente()"
+        class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg"
+      >
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+        </svg>
+        Nouvelle Vente
+      </button>
+    </div>
+  </div>
+
+  <!-- Loader -->
+  <div *ngIf="loading" class="flex justify-center items-center py-32">
+    <div class="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 border-t-indigo-600"></div>
+  </div>
+
+  <!-- Tableau -->
+  <div *ngIf="!loading" class="bg-white rounded-lg shadow-sm overflow-hidden" style="margin:5px;padding:5px">
+    <div class="overflow-x-auto">
+      <table class="w-full min-w-max table-auto">
+        <thead class="border-b border-gray-100">
+          <tr>
+            <th class="px-6 py-4 text-left">
+              <p class="text-xs font-bold uppercase tracking-wider text-gray-600 opacity-80">N° Facture</p>
+            </th>
+            <th class="px-6 py-4 text-left">
+              <p class="text-xs font-bold uppercase tracking-wider text-gray-600 opacity-80">Date</p>
+            </th>
+            <!-- Colonne Vendeur visible seulement pour l'admin -->
+            <th *ngIf="authService.isAdmin()" class="px-6 py-4 text-left">
+              <p class="text-xs font-bold uppercase tracking-wider text-gray-600 opacity-80">Vendeur</p>
+            </th>
+            <th class="px-6 py-4 text-left">
+              <p class="text-xs font-bold uppercase tracking-wider text-gray-600 opacity-80">Articles</p>
+            </th>
+            <th class="px-6 py-4 text-left">
+              <p class="text-xs font-bold uppercase tracking-wider text-gray-600 opacity-80">Montant</p>
+            </th>
+            <th class="px-6 py-4 text-left">
+              <p class="text-xs font-bold uppercase tracking-wider text-gray-600 opacity-80">Statut</p>
+            </th>
+            <th class="px-6 py-4 text-right">
+              <p class="text-xs font-bold uppercase tracking-wider text-gray-600 opacity-80">Actions</p>
+            </th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+          <tr *ngFor="let vente of ventes" class="hover:bg-gray-50 transition-colors">
+            <td class="px-6 py-5">
+              <p class="text-sm font-semibold text-indigo-600">{{ vente.numeroFacture }}</p>
+            </td>
+            <td class="px-6 py-5">
+              <p class="text-sm text-gray-900">{{ formatDate(vente.dateVente) }}</p>
+            </td>
+            <!-- Colonne Vendeur visible seulement pour l'admin -->
+            <td *ngIf="authService.isAdmin()" class="px-6 py-5">
+              <p class="text-sm text-gray-900">{{ vente.vendeurNom }}</p>
+            </td>
+            <td class="px-6 py-5">
+              <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                {{ vente.lignes.length }} article(s)
+              </span>
+            </td>
+            <td class="px-6 py-5">
+              <p class="text-sm font-bold text-gray-900">{{ vente.montantTTC | number:'1.0-0' }} XAF</p>
+              <p *ngIf="vente.montantReductions > 0" class="text-xs text-green-600">
+                -{{ vente.montantReductions | number:'1.0-0' }} XAF réduction
+              </p>
+            </td>
+            <td class="px-6 py-5">
+              <span
+                [class]="'inline-grid items-center font-bold uppercase whitespace-nowrap select-none py-1.5 px-3 text-xs rounded-xl ' +
+                  (vente.statut === StatutVente.VALIDEE ? 'bg-green-500/20 text-green-700' : 'bg-red-500/20 text-red-700')"
+              >
+                {{ vente.statut }}
+              </span>
+            </td>
+            <td class="px-6 py-5 text-right">
+              <div class="flex justify-end items-center gap-2">
+                <!-- Voir détail -->
+                <button (click)="voirDetail(vente)"
+                  class="p-2.5 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors" title="Voir détails">
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                  </svg>
+                </button>
+
+                <!-- Télécharger facture -->
+                <button (click)="telechargerFacture(vente.id)"
+                  class="p-2.5 text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors" title="Télécharger facture">
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                  </svg>
+                </button>
+
+                <!-- Annuler — Admin uniquement -->
+                <button
+                  *ngIf="authService.isAdmin() && vente.statut === StatutVente.VALIDEE"
+                  (click)="annulerVente(vente)"
+                  class="p-2.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                  title="Annuler la vente"
+                >
+                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                </button>
+              </div>
+            </td>
+          </tr>
+
+          <!-- Aucune vente -->
+          <tr *ngIf="ventes.length === 0">
+            <td [attr.colspan]="authService.isAdmin() ? 7 : 6" class="px-6 py-16 text-center">
+              <svg class="mx-auto h-16 w-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+              </svg>
+              <p class="mt-4 text-lg font-medium text-gray-900">Aucune vente trouvée</p>
+              <p class="mt-2 text-sm text-gray-500">
+                {{ authService.isAdmin() ? 'Aucune vente enregistrée.' : 'Vous n\'avez pas encore effectué de vente.' }}
+              </p>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="totalPages > 1" class="mt-6 flex items-center justify-center">
+    <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+      <button [disabled]="currentPage === 0" (click)="onPageChange(currentPage - 1)"
+        class="relative inline-flex items-center px-4 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd"/>
+        </svg>
+      </button>
+      <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+        Page {{ currentPage + 1 }} sur {{ totalPages }}
+      </span>
+      <button [disabled]="currentPage === totalPages - 1" (click)="onPageChange(currentPage + 1)"
+        class="relative inline-flex items-center px-4 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed">
+        <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/>
+        </svg>
+      </button>
+    </nav>
+  </div>
+</div>
+
+<!-- MODAL DÉTAIL VENTE (inchangé) -->
+<div *ngIf="showDetailModal && venteSelectionnee"
+  class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
+  <div class="relative bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+    <div class="flex items-center justify-between p-6 border-b border-gray-200">
+      <div>
+        <h3 class="text-2xl font-bold text-gray-900">Détail de la Vente</h3>
+        <p class="mt-1 text-sm text-gray-600">{{ venteSelectionnee.numeroFacture }}</p>
+      </div>
+      <button (click)="closeDetailModal()" class="text-gray-400 hover:text-gray-600">
+        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="p-6 space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <h4 class="text-sm font-medium text-gray-500 mb-3">Informations</h4>
+          <dl class="space-y-2">
+            <div class="flex justify-between">
+              <dt class="text-sm text-gray-600">Date :</dt>
+              <dd class="text-sm font-semibold text-gray-900">{{ formatDate(venteSelectionnee.dateVente) }}</dd>
+            </div>
+            <div class="flex justify-between">
+              <dt class="text-sm text-gray-600">Vendeur :</dt>
+              <dd class="text-sm font-semibold text-gray-900">{{ venteSelectionnee.vendeurNom }}</dd>
+            </div>
+            <div class="flex justify-between">
+              <dt class="text-sm text-gray-600">Statut :</dt>
+              <dd>
+                <span [class]="'inline-grid items-center font-bold uppercase py-1 px-2 text-xs rounded ' +
+                  (venteSelectionnee.statut === StatutVente.VALIDEE ? 'bg-green-500/20 text-green-700' : 'bg-red-500/20 text-red-700')">
+                  {{ venteSelectionnee.statut }}
+                </span>
+              </dd>
+            </div>
+          </dl>
+        </div>
+        <div>
+          <h4 class="text-sm font-medium text-gray-500 mb-3">Montants</h4>
+          <dl class="space-y-2">
+            <div class="flex justify-between">
+              <dt class="text-sm text-gray-600">Montant HT :</dt>
+              <dd class="text-sm font-semibold text-gray-900">{{ venteSelectionnee.montantHT | number:'1.0-0' }} XAF</dd>
+            </div>
+            <div class="flex justify-between">
+              <dt class="text-sm text-green-600">Réductions :</dt>
+              <dd class="text-sm font-semibold text-green-600">-{{ venteSelectionnee.montantReductions | number:'1.0-0' }} XAF</dd>
+            </div>
+            <div class="flex justify-between pt-2 border-t border-gray-200">
+              <dt class="text-base font-bold text-gray-900">TOTAL TTC :</dt>
+              <dd class="text-lg font-bold text-indigo-600">{{ venteSelectionnee.montantTTC | number:'1.0-0' }} XAF</dd>
+            </div>
+          </dl>
+        </div>
+      </div>
+
+      <div *ngIf="venteSelectionnee.statut === StatutVente.ANNULEE && venteSelectionnee.motifAnnulation"
+        class="p-4 bg-red-50 border border-red-200 rounded-lg">
+        <p class="text-sm font-medium text-red-800">Motif d'annulation :</p>
+        <p class="text-sm text-red-700 mt-1">{{ venteSelectionnee.motifAnnulation }}</p>
+      </div>
+
+      <div>
+        <h4 class="text-sm font-medium text-gray-500 mb-3">Articles Vendus</h4>
+        <div class="border border-gray-200 rounded-lg overflow-hidden">
+          <table class="w-full">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Code</th>
+                <th class="px-4 py-3 text-left text-xs font-bold text-gray-600 uppercase">Titre</th>
+                <th class="px-4 py-3 text-center text-xs font-bold text-gray-600 uppercase">Qté</th>
+                <th class="px-4 py-3 text-right text-xs font-bold text-gray-600 uppercase">P.U</th>
+                <th class="px-4 py-3 text-right text-xs font-bold text-gray-600 uppercase">Réduc.</th>
+                <th class="px-4 py-3 text-right text-xs font-bold text-gray-600 uppercase">Total</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              <tr *ngFor="let ligne of venteSelectionnee.lignes">
+                <td class="px-4 py-3 text-sm text-gray-600">{{ ligne.codeLivre }}</td>
+                <td class="px-4 py-3 text-sm text-gray-900">
+                  {{ ligne.titreLivre }}
+                  <span *ngIf="ligne.reductionIntitule" class="block text-xs text-green-600 mt-1">
+                    🎟️ {{ ligne.reductionIntitule }}
+                  </span>
+                </td>
+                <td class="px-4 py-3 text-sm text-center">{{ ligne.quantite }}</td>
+                <td class="px-4 py-3 text-sm text-right">{{ ligne.prixUnitaire | number:'1.0-0' }}</td>
+                <td class="px-4 py-3 text-sm text-right text-green-600">
+                  {{ ligne.montantReduction > 0 ? ('-' + (ligne.montantReduction | number:'1.0-0')) : '—' }}
+                </td>
+                <td class="px-4 py-3 text-sm text-right font-semibold">{{ ligne.sousTotal | number:'1.0-0' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-end gap-3 p-6 border-t border-gray-200 bg-gray-50">
+      <button (click)="telechargerFacture(venteSelectionnee.id)"
+        class="inline-flex items-center px-6 py-2.5 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition-colors">
+        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+        </svg>
+        Télécharger Facture
+      </button>
+      <button (click)="closeDetailModal()"
+        class="px-6 py-2.5 text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 font-medium">
+        Fermer
+      </button>
+    </div>
+  </div>
+</div>

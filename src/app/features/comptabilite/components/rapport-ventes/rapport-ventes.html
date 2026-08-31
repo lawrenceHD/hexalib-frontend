@@ -1,0 +1,122 @@
+<div class="p-4 sm:p-6 lg:p-8 min-h-screen bg-gray-50 antialiased" style="margin:5px;padding:5px">
+
+  <!-- En-tête + Filtres -->
+  <div style="margin:5px;padding:5px" class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-4">Rapport des Ventes</h1>
+    <div style="margin:5px;padding:5px" class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex flex-wrap gap-4 items-end">
+      <div style="margin:5px;padding:5px">
+        <label class="block text-xs font-medium text-gray-500 mb-1">Type de rapport</label>
+        <select [(ngModel)]="typeRapport" style="padding: 0.625rem 1rem;"
+          class="border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white">
+          <option value="COMBINE">Rapport Combiné</option>
+          <option value="AVEC_REDUCTION">Ventes avec Réductions</option>
+          <option value="SANS_REDUCTION">Ventes sans Réduction</option>
+        </select>
+      </div>
+      <div style="margin:5px;padding:5px">
+        <label class="block text-xs font-medium text-gray-500 mb-1">Du</label>
+        <input type="date" [(ngModel)]="debut" style="padding: 0.625rem 1rem;"
+          class="border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+      </div>
+      <div style="margin:5px;padding:5px">
+        <label class="block text-xs font-medium text-gray-500 mb-1">Au</label>
+        <input type="date" [(ngModel)]="fin" style="padding: 0.625rem 1rem;"
+          class="border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"/>
+      </div>
+      <button (click)="generer()" style="padding: 0.625rem 1.25rem;"
+      style="margin:5px;padding:5px"
+        class="inline-flex items-center bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg text-sm transition-colors">
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+        </svg>
+        Générer
+      </button>
+    </div>
+  </div>
+
+  <div style="margin:5px;padding:5px" *ngIf="loading" class="flex justify-center items-center py-32">
+    <div class="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 border-t-indigo-600"></div>
+  </div>
+
+  <div style="margin:5px;padding:5px" *ngIf="!loading && rapport">
+
+    <!-- KPIs -->
+    <div style="margin:5px;padding:5px" class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div style="margin:5px;padding:5px" class="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
+        <p class="text-xs text-gray-500 mb-1">Nombre de ventes</p>
+        <p class="text-2xl font-bold text-gray-900">{{ rapport.nombreVentes }}</p>
+      </div>
+      <div style="margin:5px;padding:5px" class="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
+        <p class="text-xs text-gray-500 mb-1">CA Total</p>
+        <p class="text-2xl font-bold text-indigo-600">{{ rapport.caTotal | number:'1.0-0' }} XAF</p>
+      </div>
+      <div style="margin:5px;padding:5px" class="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
+        <p class="text-xs text-gray-500 mb-1">Réductions accordées</p>
+        <p class="text-2xl font-bold text-orange-500">-{{ rapport.totalReductions | number:'1.0-0' }} XAF</p>
+      </div>
+      <div style="margin:5px;padding:5px" class="bg-white rounded-xl shadow-sm p-5 border border-gray-100">
+        <p class="text-xs text-gray-500 mb-1">CA Net</p>
+        <p class="text-2xl font-bold text-green-600">{{ rapport.caNnet | number:'1.0-0' }} XAF</p>
+      </div>
+    </div>
+
+    <!-- Stats Avec/Sans réduction (si COMBINE) -->
+    <div style="margin:5px;padding:5px" *ngIf="typeRapport === 'COMBINE'" class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+      <div style="margin:5px;padding:5px" class="bg-green-50 border border-green-200 rounded-xl p-5">
+        <h3 class="text-sm font-semibold text-green-700 mb-3">✅ Ventes avec Réductions</h3>
+        <p class="text-xl font-bold text-green-800">{{ rapport.nombreVentesAvecReduction }} vente(s)</p>
+        <p class="text-sm text-green-600 mt-1">CA : {{ rapport.caVentesAvecReduction | number:'1.0-0' }} XAF</p>
+        <p class="text-sm text-orange-600">Réductions : -{{ rapport.montantReductionsAccordees | number:'1.0-0' }} XAF</p>
+      </div>
+      <div style="margin:5px;padding:5px" class="bg-blue-50 border border-blue-200 rounded-xl p-5">
+        <h3 class="text-sm font-semibold text-blue-700 mb-3">💰 Ventes sans Réduction</h3>
+        <p class="text-xl font-bold text-blue-800">{{ rapport.nombreVentesSansReduction }} vente(s)</p>
+        <p class="text-sm text-blue-600 mt-1">CA : {{ rapport.caVentesSansReduction | number:'1.0-0' }} XAF</p>
+      </div>
+    </div>
+
+    <!-- Tableau des ventes -->
+    <div style="margin:5px;padding:5px" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+      <div style="margin:5px;padding:5px" class="px-6 py-4 border-b border-gray-100">
+        <h2 class="text-lg font-semibold text-gray-900">{{ getTypeLabel() }}</h2>
+        <p class="text-sm text-gray-500 mt-0.5">Du {{ rapport.dateDebut | date:'dd/MM/yyyy' }} au {{ rapport.dateFin | date:'dd/MM/yyyy' }}</p>
+      </div>
+      <div style="margin:5px;padding:5px" class="overflow-x-auto">
+        <table class="w-full min-w-max">
+          <thead class="bg-gray-50 border-b border-gray-100">
+            <tr>
+              <th class="px-5 py-3 text-left text-xs font-bold uppercase text-gray-600">N° Facture</th>
+              <th class="px-5 py-3 text-left text-xs font-bold uppercase text-gray-600">Date</th>
+              <th class="px-5 py-3 text-left text-xs font-bold uppercase text-gray-600">Vendeur</th>
+              <th class="px-5 py-3 text-center text-xs font-bold uppercase text-gray-600">Articles</th>
+              <th class="px-5 py-3 text-right text-xs font-bold uppercase text-gray-600">Montant HT</th>
+              <th class="px-5 py-3 text-right text-xs font-bold uppercase text-gray-600">Réduction</th>
+              <th class="px-5 py-3 text-right text-xs font-bold uppercase text-gray-600">Total TTC</th>
+              <th class="px-5 py-3 text-center text-xs font-bold uppercase text-gray-600">Réduction ?</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            <tr *ngFor="let v of rapport.ventes" class="hover:bg-gray-50 transition-colors">
+              <td class="px-5 py-4 text-sm font-semibold text-indigo-600">{{ v.numeroFacture }}</td>
+              <td class="px-5 py-4 text-sm text-gray-700">{{ v.dateVente | date:'dd/MM/yyyy HH:mm' }}</td>
+              <td class="px-5 py-4 text-sm text-gray-700">{{ v.vendeurNom }}</td>
+              <td class="px-5 py-4 text-sm text-center text-gray-700">{{ v.nombreArticles }}</td>
+              <td class="px-5 py-4 text-sm text-right text-gray-700">{{ v.montantHT | number:'1.0-0' }}</td>
+              <td class="px-5 py-4 text-sm text-right text-orange-600">
+                {{ v.montantReduction > 0 ? ('-' + (v.montantReduction | number:'1.0-0')) : '—' }}
+              </td>
+              <td class="px-5 py-4 text-sm text-right font-bold text-gray-900">{{ v.montantTTC | number:'1.0-0' }}</td>
+              <td class="px-5 py-4 text-center">
+                <span *ngIf="v.aReduction" class="inline-flex px-2 py-0.5 text-xs font-medium bg-green-100 text-green-700 rounded-full">Oui</span>
+                <span *ngIf="!v.aReduction" class="inline-flex px-2 py-0.5 text-xs font-medium bg-gray-100 text-gray-500 rounded-full">Non</span>
+              </td>
+            </tr>
+            <tr *ngIf="rapport.ventes.length === 0">
+              <td colspan="8" class="px-5 py-12 text-center text-gray-400">Aucune vente sur cette période</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

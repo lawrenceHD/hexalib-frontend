@@ -1,0 +1,205 @@
+<div *ngIf="rapport" class="p-4 sm:p-6">
+
+  <!-- Titre -->
+  <div class="flex items-center gap-4 mb-6">
+    <div class="w-12 h-12 rounded-xl bg-indigo-100 flex items-center justify-center flex-shrink-0">
+      <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+      </svg>
+    </div>
+    <div>
+      <h2 class="text-xl font-bold text-gray-900">Rapport de Clôture Journalière</h2>
+      <p class="text-sm text-gray-500 capitalize">{{ formatDate(rapport.date) }}</p>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div class="kpi-card kpi-card--indigo">
+      <div class="kpi-icon kpi-icon--indigo">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        </svg>
+      </div>
+      <div>
+        <p class="kpi-label">Nombre de ventes</p>
+        <p class="kpi-value">{{ rapport.nombreVentes }}</p>
+      </div>
+    </div>
+
+    <div class="kpi-card kpi-card--green">
+      <div class="kpi-icon kpi-icon--green">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+        </svg>
+      </div>
+      <div>
+        <p class="kpi-label">Chiffre d'affaires</p>
+        <p class="kpi-value">{{ formatCurrency(rapport.chiffreAffaires) }}</p>
+      </div>
+    </div>
+
+    <div class="kpi-card kpi-card--orange">
+      <div class="kpi-icon kpi-icon--orange">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+        </svg>
+      </div>
+      <div>
+        <p class="kpi-label">Réductions accordées</p>
+        <p class="kpi-value">{{ formatCurrency(rapport.montantReductions) }}</p>
+      </div>
+    </div>
+
+    <div class="kpi-card kpi-card--purple">
+      <div class="kpi-icon kpi-icon--purple">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+        </svg>
+      </div>
+      <div>
+        <p class="kpi-label">Livres vendus</p>
+        <p class="kpi-value">{{ rapport.nombreLivresVendus }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CA par vendeur -->
+  <div *ngIf="rapport.caParVendeur?.length" class="section-card mb-4">
+    <div class="section-header">
+      <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+      </svg>
+      <h3 class="section-title">Performance des Vendeurs</h3>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="rapport-table">
+        <thead>
+          <tr>
+            <th>#</th><th>Vendeur</th><th>Ventes</th><th>CA</th><th>Panier moyen</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let v of rapport.caParVendeur" class="hover:bg-gray-50 transition-colors">
+            <td><span [class]="getRangClass(v.rang)">{{ v.rang }}</span></td>
+            <td class="font-medium text-gray-900">{{ v.nomComplet }}</td>
+            <td class="text-center">{{ v.nombreVentes }}</td>
+            <td class="font-semibold text-indigo-700">{{ formatCurrency(v.chiffreAffaires) }}</td>
+            <td>{{ formatCurrency(v.panierMoyen) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Top 5 livres -->
+  <div *ngIf="rapport.topLivres?.length" class="section-card mb-4">
+    <div class="section-header">
+      <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+      </svg>
+      <h3 class="section-title">Top 5 Livres Vendus</h3>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="rapport-table">
+        <thead>
+          <tr>
+            <th>#</th><th>Code</th><th>Titre</th><th>Auteur</th><th>Qté</th><th>CA</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let l of rapport.topLivres" class="hover:bg-gray-50 transition-colors">
+            <td><span [class]="getRangClass(l.rang)">{{ l.rang }}</span></td>
+            <td><code class="code-tag">{{ l.code }}</code></td>
+            <td class="font-medium text-gray-900">{{ l.titre }}</td>
+            <td class="text-gray-500">{{ l.auteur }}</td>
+            <td class="text-center font-semibold">{{ l.quantiteVendue }}</td>
+            <td class="font-semibold text-indigo-700">{{ formatCurrency(l.chiffreAffaires) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Top 3 catégories -->
+  <div *ngIf="rapport.topCategories?.length" class="section-card mb-4">
+    <div class="section-header">
+      <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"/>
+      </svg>
+      <h3 class="section-title">Top 3 Catégories</h3>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="rapport-table">
+        <thead>
+          <tr>
+            <th>#</th><th>Catégorie</th><th>Qté vendue</th><th>CA</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let c of rapport.topCategories" class="hover:bg-gray-50 transition-colors">
+            <td><span [class]="getRangClass(c.rang)">{{ c.rang }}</span></td>
+            <td class="font-medium text-gray-900">{{ c.nom }}</td>
+            <td class="text-center font-semibold">{{ c.quantiteVendue }}</td>
+            <td class="font-semibold text-indigo-700">{{ formatCurrency(c.chiffreAffaires) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Alertes stock critique -->
+  <div *ngIf="rapport.alertesStock?.length" class="section-card section-card--danger mb-4">
+    <div class="section-header">
+      <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+      </svg>
+      <h3 class="section-title text-red-700">⚠ Alertes Stock Critique ({{ rapport.alertesStock.length }})</h3>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="rapport-table">
+        <thead>
+          <tr>
+            <th>Code</th><th>Titre</th><th>Auteur</th><th>Catégorie</th>
+            <th>Stock</th><th>Seuil</th><th>Statut</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let a of rapport.alertesStock"
+              class="hover:bg-gray-50 transition-colors"
+              [class.bg-red-50]="a.statutStock === 'RUPTURE'">
+            <td><code class="code-tag">{{ a.code }}</code></td>
+            <td class="font-medium text-gray-900">{{ a.titre }}</td>
+            <td class="text-gray-500">{{ a.auteur }}</td>
+            <td>{{ a.categorie }}</td>
+            <td class="text-center font-bold">{{ a.quantiteStock }}</td>
+            <td class="text-center text-gray-500">{{ a.seuilMinimal }}</td>
+            <td>
+              <span [class]="getStockBadgeClass(a.statutStock)">{{ a.statutStock }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Aucune alerte -->
+  <div *ngIf="!rapport.alertesStock?.length"
+       class="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg text-green-700 font-medium mb-4">
+    <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    </svg>
+    Aucun livre en stock critique ce jour
+  </div>
+
+</div>

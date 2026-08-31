@@ -1,17 +1,18 @@
-// auth.guard.ts
-import { inject } from '@angular/core';
-import { Router, CanActivateFn } from '@angular/router';
-import { AuthService } from '../services/auth';
+// src/app/core/guards/auth.guard.ts
 
-export const authGuard: CanActivateFn = (route, state) => {
+import { inject }        from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
+import { AuthService }   from '../services/auth';
+
+export const authGuard: CanActivateFn = () => {
   const authService = inject(AuthService);
-  const router = inject(Router);
+  const router      = inject(Router);
 
   if (authService.isAuthenticated()) {
     return true;
   }
 
-  authService.logout(); // Nettoyage propre
-  router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
+  // Redirection simple SANS returnUrl — c'est le returnUrl qui crée la boucle
+  router.navigate(['/login']);
   return false;
 };

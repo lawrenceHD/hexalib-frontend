@@ -1,17 +1,19 @@
-// admin.guard.ts
-import { inject } from '@angular/core';
-import { Router, CanActivateFn } from '@angular/router';
+// src/app/core/guards/role-guard.ts
+
+import { inject }      from '@angular/core';
+import { CanActivateFn, ActivatedRouteSnapshot, Router } from '@angular/router';
 import { AuthService } from '../services/auth';
 
-export const adminGuard: CanActivateFn = (route, state) => {
-  const authService = inject(AuthService);
-  const router = inject(Router);
+export const roleGuard: CanActivateFn = (route: ActivatedRouteSnapshot) => {
+  const authService   = inject(AuthService);
+  const router        = inject(Router);
+  const allowedRoles: string[] = route.data?.['roles'] ?? [];
+  const userRole = authService.currentUserValue?.role;
 
-  if (authService.isAuthenticated() && authService.isAdmin()) {
+  if (userRole && allowedRoles.includes(userRole)) {
     return true;
   }
 
-  authService.logout();
-  router.navigate(['/login'], { queryParams: { returnUrl: state.url } });
+  router.navigate(['/dashboard']);
   return false;
 };

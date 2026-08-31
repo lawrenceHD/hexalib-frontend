@@ -55,3 +55,19 @@ export interface PageResponse<T> {
   totalPages: number;
   last: boolean;
 }
+
+export interface DoublonInfo {
+  titre: string;
+  auteur: string;
+  prixVente: string;
+  numeroLigne: number;
+}
+ 
+export interface ImportResultResponse {
+  totalLignesLues: number;
+  livresAjoutes: number;
+  lignesIncompletes: number;
+  doublonsTrouves: number;
+  doublons: DoublonInfo[];
+  lignesIgnoreesDetail: string[];
+}
