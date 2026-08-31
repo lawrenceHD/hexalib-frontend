@@ -2,23 +2,15 @@ import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
 import { Router } from '@angular/router';
-import { TokenService } from '../services/token';
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
-  const router       = inject(Router);
-  const tokenService = inject(TokenService);
+  const router = inject(Router);
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
       let errorMessage = 'Une erreur est survenue. Veuillez réessayer plus tard.';
 
-      if (error.status === 401) {
-        // 401 = token expiré/invalide → déconnexion + redirection SANS returnUrl
-        errorMessage = error.error?.message || 'Session expirée. Veuillez vous reconnecter.';
-        tokenService.clear();
-        router.navigate(['/login']);
-      }
-      else if (error.status === 403) {
+      if (error.status === 403) {
         // 403 = authentifié mais pas les droits → NE PAS déconnecter, NE PAS rediriger
         // On laisse le composant gérer l'erreur (afficher un message, etc.)
         errorMessage = error.error?.message || 'Accès refusé. Permissions insuffisantes.';

@@ -8,7 +8,7 @@ import {
   User, UserPage, UserStats,
   CreateUserPayload, UpdateUserPayload
 } from '../../../core/models/user.model';
-import { ApiResponse }   from '../../../core/models/auth.model';
+import { ApiResponse }   from '../../../core/models/api-response.model';
 
 @Injectable({ providedIn: 'root' })
 export class UserService {

@@ -1,4 +1,4 @@
-// login.ts COMPLET avec logs de debug
+// login.ts
 
 import { Component, OnInit }  from '@angular/core';
 import { CommonModule }        from '@angular/common';
@@ -33,18 +33,7 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    // ── DEBUG ──────────────────────────────────────────────────────────────
-    console.log('──────────────────────────────────');
-    console.log('[LOGIN] ngOnInit appelé');
-    console.log('[LOGIN] URL:', window.location.href);
-    console.log('[LOGIN] isAuthenticated:', this.authService.isAuthenticated());
-    console.log('[LOGIN] accessToken:', this.authService.accessToken ? 'PRESENT' : 'ABSENT');
-    console.log('[LOGIN] currentUser:', this.authService.currentUserValue);
-    console.log('──────────────────────────────────');
-    // ── FIN DEBUG ──────────────────────────────────────────────────────────
-
     if (this.authService.isAuthenticated()) {
-      console.log('[LOGIN] >>> Déjà connecté → redirection /dashboard');
       this.router.navigate(['/dashboard']);
     }
   }
@@ -60,12 +49,6 @@ export class LoginComponent implements OnInit {
 
     this.authService.login(this.loginForm.value).subscribe({
       next: (response) => {
-        // ── DEBUG ──────────────────────────────────────────────────────────
-        console.log('[LOGIN] Réponse backend:', JSON.stringify(response));
-        console.log('[LOGIN] accessToken après login:', this.authService.accessToken ? 'STOCKÉ' : 'ABSENT');
-        console.log('[LOGIN] currentUser après login:', this.authService.currentUserValue);
-        // ── FIN DEBUG ──────────────────────────────────────────────────────
-
         if (response.success) {
           const user = response.data.user;
           if (user.premiereConnexion) {
@@ -73,14 +56,10 @@ export class LoginComponent implements OnInit {
           } else {
             this.toastr.success(`Bienvenue ${user.nomComplet} !`, 'Connexion réussie');
           }
-          console.log('[LOGIN] >>> Redirection vers /dashboard');
           this.router.navigate(['/dashboard']);
         }
       },
       error: (error) => {
-        // ── DEBUG ──────────────────────────────────────────────────────────
-        console.error('[LOGIN] Erreur:', error);
-        // ── FIN DEBUG ──────────────────────────────────────────────────────
         this.loading      = false;
         this.errorMessage = error?.error?.message || error?.message || 'Email ou mot de passe incorrect.';
         this.toastr.error(this.errorMessage, 'Échec de connexion');

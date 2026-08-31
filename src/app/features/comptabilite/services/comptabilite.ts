@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
+import { ApiResponse } from '../../../../core/models/api-response.model';
 import {
   DashboardComptaDTO,
   RapportVentesDTO,
@@ -10,12 +11,6 @@ import {
   RapportStockValoriseDTO,
   TypeRapportVentes
 } from '../models/comptabilite.model';
-
-interface ApiResponse<T> {
-  success: boolean;
-  message: string;
-  data: T;
-}
 
 @Injectable({ providedIn: 'root' })
 export class ComptabiliteService {

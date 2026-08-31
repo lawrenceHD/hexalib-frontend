@@ -1,10 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { VenteService } from '../../services/vente';
-import { VenteResponse, StatutVente } from '../../models/vente.model';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth';
+import { VenteService } from '../../services/vente';
+import { VenteResponse, StatutVente } from '../../models/vente.model';
 
 @Component({
   selector: 'app-vente-list',
@@ -66,7 +67,7 @@ export class VenteListComponent implements OnInit {
       request$ = this.venteService.getMesVentes(this.currentPage, this.pageSize);
     }
 
-    request$.subscribe({
+    request$.pipe(takeUntilDestroyed()).subscribe({
       next: (response) => {
         this.ventes = response.data.content;
         this.totalElements = response.data.totalElements;
