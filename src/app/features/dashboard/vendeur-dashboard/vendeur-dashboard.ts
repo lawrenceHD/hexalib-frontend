@@ -1,12 +1,9 @@
 // src/app/features/dashboard/vendeur-dashboard/vendeur-dashboard.ts
 
 import { Component, OnInit } from '@angular/core';
-import { CommonModule }      from '@angular/common';
-import { RouterModule }      from '@angular/router';
-import { AuthService }       from '../../../core/services/auth';
-import { HttpClient }        from '@angular/common/http';
-import { environment }       from '../../../../environments/environment';
-import { User }              from '../../../core/models/user.model';
+import { CommonModule } from '@angular/common';
+import { RouterModule } from '@angular/router';
+import { AuthService } from '../../../core/services/auth';
 
 interface DashboardVendeur {
   mesVentesJour:             number;
@@ -31,8 +28,7 @@ interface TopLivre {
   selector:    'app-vendeur-dashboard',
   standalone:  true,
   imports:     [CommonModule, RouterModule],
-  templateUrl: './vendeur-dashboard.html',
-  styleUrl:    './vendeur-dashboard.css'
+  templateUrl: './vendeur-dashboard.html'
 })
 export class VendeurDashboardComponent implements OnInit {
   currentUser: User | null = null;

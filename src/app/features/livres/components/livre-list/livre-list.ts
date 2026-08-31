@@ -1,6 +1,5 @@
-// src/app/features/livres/components/livre-list/livre-list.component.ts
-
 import { Component, OnInit } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -16,7 +15,7 @@ import { LivreImportComponent } from '../livre-import/livre-import';
 @Component({
   selector: 'app-livre-list',
   standalone: true,
-  imports: [CommonModule, FormsModule,LivreImportComponent],
+  imports: [CommonModule, FormsModule, LivreImportComponent],
   templateUrl: './livre-list.html',
   styleUrl: './livre-list.css'
 })
@@ -26,28 +25,28 @@ export class LivreListComponent implements OnInit {
   langues: string[] = [];
   loading = false;
   showImport = false;
-  
+  showStockModal = false;
+  modalMode: 'create' | 'edit' = 'create';
+  selectedLivre: Livre | null = null;
+  showModal = false;
+  showImportResultModal = false;
+  importResult: ImportResultResponse | null = null;
+
   // Filtres
   searchTerm = '';
   selectedCategorieId = '';
   selectedStatut = '';
   selectedLangue = '';
-  
+
   // Pagination
   currentPage = 0;
   pageSize = 20;
   totalElements = 0;
   totalPages = 0;
 
-  // Modal
-  showModal = false;
-  showStockModal = false;
-  modalMode: 'create' | 'edit' = 'create';
-  selectedLivre: Livre | null = null;
-  
   // Form
   formData: any = this.initFormData();
-  
+
   // Ajustement stock
   stockFormData = {
     quantite: 0,
@@ -89,13 +88,13 @@ export class LivreListComponent implements OnInit {
   loadLivres(): void {
     this.loading = true;
     this.livreService.getAllLivres(
-      this.currentPage, 
-      this.pageSize, 
+      this.currentPage,
+      this.pageSize,
       this.searchTerm,
       this.selectedCategorieId,
       this.selectedStatut,
       this.selectedLangue
-    ).subscribe({
+    ).pipe(takeUntilDestroyed()).subscribe({
       next: (response) => {
         if (response.success) {
           this.livres = response.data.content;
@@ -112,7 +111,7 @@ export class LivreListComponent implements OnInit {
   }
 
   loadCategoriesActives(): void {
-    this.categorieService.getAllCategoriesActives().subscribe({
+    this.categorieService.getAllCategoriesActives().pipe(takeUntilDestroyed()).subscribe({
       next: (response) => {
         if (response.success) {
           this.categories = response.data;
@@ -125,7 +124,7 @@ export class LivreListComponent implements OnInit {
   }
 
   loadLangues(): void {
-    this.livreService.getAllLangues().subscribe({
+    this.livreService.getAllLangues().pipe(takeUntilDestroyed()).subscribe({
       next: (response) => {
         if (response.success) {
           this.langues = response.data;
@@ -161,12 +160,10 @@ export class LivreListComponent implements OnInit {
   }
 
   openCreateModal(): void {
-  console.log('Opening modal...'); // ✅ Debug
-  this.modalMode = 'create';
-  this.formData = this.initFormData();
-  this.showModal = true;
-  console.log('showModal:', this.showModal); // ✅ Debug
-}
+    this.modalMode = 'create';
+    this.formData = this.initFormData();
+    this.showModal = true;
+  }
 
   openEditModal(livre: Livre): void {
     this.modalMode = 'edit';
@@ -223,7 +220,7 @@ export class LivreListComponent implements OnInit {
 
   createLivre(): void {
     this.loading = true;
-    this.livreService.createLivre(this.formData).subscribe({
+    this.livreService.createLivre(this.formData).pipe(takeUntilDestroyed()).subscribe({
       next: (response) => {
         if (response.success) {
           this.toastr.success('Livre créé avec succès', 'Succès');
@@ -243,7 +240,7 @@ export class LivreListComponent implements OnInit {
     if (!this.selectedLivre) return;
 
     this.loading = true;
-    this.livreService.updateLivre(this.selectedLivre.id, this.formData).subscribe({
+    this.livreService.updateLivre(this.selectedLivre.id, this.formData).pipe(takeUntilDestroyed()).subscribe({
       next: (response) => {
         if (response.success) {
           this.toastr.success('Livre modifié avec succès', 'Succès');
@@ -264,7 +261,7 @@ export class LivreListComponent implements OnInit {
       return;
     }
 
-    this.livreService.deleteLivre(livre.id).subscribe({
+    this.livreService.deleteLivre(livre.id).pipe(takeUntilDestroyed()).subscribe({
       next: (response) => {
         if (response.success) {
           this.toastr.success('Livre supprimé avec succès', 'Succès');
@@ -278,7 +275,7 @@ export class LivreListComponent implements OnInit {
   }
 
   toggleStatut(livre: Livre): void {
-    this.livreService.toggleStatut(livre.id).subscribe({
+    this.livreService.toggleStatut(livre.id).pipe(takeUntilDestroyed()).subscribe({
       next: (response) => {
         if (response.success) {
           const action = response.data.statut === 'ACTIF' ? 'activé' : 'désactivé';
@@ -315,10 +312,10 @@ export class LivreListComponent implements OnInit {
     }
 
     this.livreService.ajusterStock(
-      this.selectedLivre.id, 
-      this.stockFormData.quantite, 
+      this.selectedLivre.id,
+      this.stockFormData.quantite,
       this.stockFormData.motif
-    ).subscribe({
+    ).pipe(takeUntilDestroyed()).subscribe({
       next: (response) => {
         if (response.success) {
           this.toastr.success('Stock ajusté avec succès', 'Succès');
@@ -329,7 +326,7 @@ export class LivreListComponent implements OnInit {
       error: (error) => {
         this.toastr.error(error.message || 'Erreur', 'Erreur');
       }
-    });
+    );
   }
 
   getStatutStockClass(livre: Livre): string {
@@ -364,90 +361,87 @@ export class LivreListComponent implements OnInit {
   }
 
   // Modal import
-showImportModal = false;
-importCategorieId = '';
-importFile: File | null = null;
-importLoading = false;
- 
-// Modal résultat import
-showImportResultModal = false;
-importResult: ImportResultResponse | null = null;
- 
-// ── Méthodes à ajouter ──
- 
-openImportModal(): void {
-  this.importCategorieId = '';
-  this.importFile = null;
-  this.showImportModal = true;
-}
- 
-closeImportModal(): void {
-  this.showImportModal = false;
-  this.importCategorieId = '';
-  this.importFile = null;
-}
- 
-onFileSelected(event: Event): void {
-  const input = event.target as HTMLInputElement;
-  if (input.files && input.files.length > 0) {
-    const file = input.files[0];
-    const allowed = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-                     'application/vnd.ms-excel'];
-    if (!allowed.includes(file.type) && !file.name.endsWith('.xlsx') && !file.name.endsWith('.xls')) {
-      this.toastr.error('Veuillez sélectionner un fichier Excel (.xlsx ou .xls)', 'Format invalide');
-      input.value = '';
+  showImportModal = false;
+  importCategorieId = '';
+  importFile: File | null = null;
+  importLoading = false;
+
+  // Modal résultat import
+  showImportResultModal = false;
+  importResult: ImportResultResponse | null = null;
+
+  openImportModal(): void {
+    this.importCategorieId = '';
+    this.importFile = null;
+    this.showImportModal = true;
+  }
+
+  closeImportModal(): void {
+    this.showImportModal = false;
+    this.importCategorieId = '';
+    this.importFile = null;
+  }
+
+  onFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      const allowed = ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                       'application/vnd.ms-excel'];
+      if (!allowed.includes(file.type) && !file.name.endsWith('.xlsx') && !file.name.endsWith('.xls')) {
+        this.toastr.error('Veuillez sélectionner un fichier Excel (.xlsx ou .xls)', 'Format invalide');
+        input.value = '';
+        return;
+      }
+      this.importFile = file;
+    }
+  }
+
+  lancerImport(): void {
+    if (!this.importCategorieId) {
+      this.toastr.warning('Veuillez sélectionner une catégorie', 'Validation');
       return;
     }
-    this.importFile = file;
-  }
-}
- 
-lancerImport(): void {
-  if (!this.importCategorieId) {
-    this.toastr.warning('Veuillez sélectionner une catégorie', 'Validation');
-    return;
-  }
-  if (!this.importFile) {
-    this.toastr.warning('Veuillez sélectionner un fichier Excel', 'Validation');
-    return;
-  }
- 
-  this.importLoading = true;
-  this.livreService.importLivres(this.importFile, this.importCategorieId).subscribe({
-    next: (response) => {
-      this.importResult = response.data;
-      this.importLoading = false;
-      this.closeImportModal();
-      this.showImportResultModal = true; // Afficher le résultat
-      this.loadLivres(); // Recharger la liste
-    },
-    error: (error) => {
-      this.toastr.error(error.message || 'Erreur lors de l\'import', 'Erreur');
-      this.importLoading = false;
+    if (!this.importFile) {
+      this.toastr.warning('Veuillez sélectionner un fichier Excel', 'Validation');
+      return;
     }
-  });
-}
- 
-closeImportResultModal(): void {
-  this.showImportResultModal = false;
-  this.importResult = null;
-}
- 
-exporterLivres(): void {
-  this.livreService.exportLivres().subscribe({
-    next: (blob) => {
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      const date = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-      link.download = `Inventaire_Hexalib_${date}.xlsx`;
-      link.click();
-      window.URL.revokeObjectURL(url);
-      this.toastr.success('Export téléchargé avec succès', 'Export');
-    },
-    error: () => {
-      this.toastr.error('Erreur lors de l\'export', 'Erreur');
-    }
-  });
-}
+
+    this.importLoading = true;
+    this.livreService.importLivres(this.importFile, this.importCategorieId).pipe(takeUntilDestroyed()).subscribe({
+      next: (response) => {
+        this.importResult = response.data;
+        this.importLoading = false;
+        this.closeImportModal();
+        this.showImportResultModal = true;
+        this.loadLivres();
+      },
+      error: (error) => {
+        this.toastr.error(error.message || 'Erreur lors de l\'import', 'Erreur');
+        this.importLoading = false;
+      }
+    });
+  }
+
+  closeImportResultModal(): void {
+    this.showImportResultModal = false;
+    this.importResult = null;
+  }
+
+  exporterLivres(): void {
+    this.livreService.exportLivres().pipe(takeUntilDestroyed()).subscribe({
+      next: (blob) => {
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `Inventaire_Hexalib_${new Date().toISOString().slice(0, 10).replace(/-/g, '')}.xlsx`;
+        link.click();
+        window.URL.revokeObjectURL(url);
+        this.toastr.success('Export téléchargé avec succès', 'Export');
+      },
+      error: () => {
+        this.toastr.error('Erreur lors de l\'export', 'Erreur');
+      }
+    });
+  }
 }

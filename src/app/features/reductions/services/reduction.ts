@@ -2,12 +2,8 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environment';
+import { ApiResponse } from '../../../../core/models/api-response.model';
 import { Reduction, ReductionRequest } from '../models/reduction.model';
-
-interface ApiResponse<T> {
-  message: string;
-  data: T;
-}
 
 interface PageResponse<T> {
   content: T[];
@@ -17,9 +13,7 @@ interface PageResponse<T> {
   number: number;
 }
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class ReductionService {
   private apiUrl = `${environment.apiUrl}/reductions`;
 
@@ -70,13 +64,9 @@ export class ReductionService {
   delete(id: string): Observable<ApiResponse<void>> {
     return this.http.delete<ApiResponse<void>>(`${this.apiUrl}/${id}`);
   }
-  /**
- * Récupère la meilleure réduction applicable à un livre donné
- * @param livreId ID du livre
- * @returns Observable avec la réduction la plus avantageuse (ou null si aucune)
- */
-getBestForLivre(livreId: string): Observable<ApiResponse<Reduction | null>> {
-  const params = new HttpParams().set('livreId', livreId);
-  return this.http.get<ApiResponse<Reduction | null>>(`${this.apiUrl}/livre/${livreId}/meilleure`, { params });
-}
+
+  getBestForLivre(livreId: string): Observable<ApiResponse<Reduction | null>> {
+    const params = new HttpParams().set('livreId', livreId);
+    return this.http.get<ApiResponse<Reduction | null>>(`${this.apiUrl}/livre/${livreId}/meilleure`, { params });
+  }
 }

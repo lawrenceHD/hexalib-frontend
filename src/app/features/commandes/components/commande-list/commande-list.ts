@@ -1,6 +1,5 @@
-// src/app/features/commandes/components/commande-list/commande-list.component.ts
-
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -10,6 +9,8 @@ import { FournisseurService } from '../../../fournisseurs/services/fournisseur';
 import { CommandeFournisseur, PageResponse } from '../../models/commande.model';
 import { Fournisseur } from '../../../fournisseurs/models/fournisseur.model';
 import { AuthService } from '../../../../core/services/auth';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-commande-list',
@@ -18,7 +19,9 @@ import { AuthService } from '../../../../core/services/auth';
   templateUrl: './commande-list.html',
   styleUrl: './commande-list.css'
 })
-export class CommandeListComponent implements OnInit {
+export class CommandeListComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+
   commandes: CommandeFournisseur[] = [];
   fournisseurs: Fournisseur[] = [];
   loading = false;
@@ -56,6 +59,11 @@ export class CommandeListComponent implements OnInit {
     this.loadFournisseurs();
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   loadCommandes(): void {
     this.loading = true;
     this.commandeService.getAllCommandes(
@@ -66,7 +74,7 @@ export class CommandeListComponent implements OnInit {
       this.selectedStatut,
       this.dateDebut,
       this.dateFin
-    ).subscribe({
+    ).pipe(takeUntil(this.destroy$)).subscribe({
       next: (response) => {
         if (response.success) {
           this.commandes = response.data.content;
@@ -136,7 +144,7 @@ export class CommandeListComponent implements OnInit {
       return;
     }
 
-    this.commandeService.deleteCommande(commande.id).subscribe({
+    this.commandeService.deleteCommande(commande.id).pipe(takeUntil(this.destroy$)).subscribe({
       next: (response) => {
         if (response.success) {
           this.toastr.success('Commande supprimée avec succès', 'Succès');
@@ -151,7 +159,7 @@ export class CommandeListComponent implements OnInit {
 
   openRecevoirModal(commande: CommandeFournisseur): void {
     this.selectedCommande = commande;
-    this.dateReception = this.formatDateForInput(new Date());
+    this.dateReception = new Date().toISOString().split('T')[0];
     this.showRecevoirModal = true;
   }
 
@@ -165,7 +173,7 @@ export class CommandeListComponent implements OnInit {
     if (!this.selectedCommande || !this.dateReception) return;
 
     this.loading = true;
-    this.commandeService.recevoirCommande(this.selectedCommande.id, this.dateReception).subscribe({
+    this.commandeService.recevoirCommande(this.selectedCommande.id, this.dateReception).pipe(takeUntil(this.destroy$)).subscribe({
       next: (response) => {
         if (response.success) {
           this.toastr.success('Commande reçue avec succès. Les stocks ont été mis à jour.', 'Succès');
@@ -197,7 +205,7 @@ export class CommandeListComponent implements OnInit {
     if (!this.selectedCommande) return;
 
     this.loading = true;
-    this.commandeService.annulerCommande(this.selectedCommande.id, this.motifAnnulation).subscribe({
+    this.commandeService.annulerCommande(this.selectedCommande.id, this.motifAnnulation).pipe(takeUntil(this.destroy$)).subscribe({
       next: (response) => {
         if (response.success) {
           this.toastr.success('Commande annulée avec succès', 'Succès');
