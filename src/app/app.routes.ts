@@ -1,6 +1,8 @@
 // src/app/app.routes.ts
 
 import { Routes } from '@angular/router';
+import { provideRouter } from '@angular/router';   // ← Ajoute cette importation si elle n'est pas là
+
 import { LoginComponent }         from './features/auth/login/login';
 import { MainLayoutComponent }    from './shared/layouts/main-layout/main-layout';
 import { CategorieListComponent } from './features/categories/components/categorie-list/categorie-list';
@@ -12,17 +14,16 @@ import { roleGuard }              from './core/guards/role-guard';
 
 export const routes: Routes = [
 
-  // ── Public (DOIT être avant le bloc path:'') ──────────────────────────────
+  // ── Public 
   { path: 'login', component: LoginComponent },
 
-  // ── Authentifié ───────────────────────────────────────────────────────────
+  // ── Authentifié 
   {
     path:        '',
     component:   MainLayoutComponent,
     canActivate: [authGuard],
     children: [
 
-      // Redirection racine → dashboard
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
 
       // Dashboard
@@ -33,29 +34,26 @@ export const routes: Routes = [
             .then(m => m.DashboardComponent)
       },
 
-      // ── Catalogue (admin + vendeur) ────────────────────────────────────────
       { path: 'livres',     component: LivreListComponent },
       { path: 'categories', component: CategorieListComponent },
       { path: 'reductions', component: ReductionListComponent },
 
-      // ── Ventes (admin + vendeur) ───────────────────────────────────────────
-     {
-  path: 'ventes',
-  loadChildren: () =>
-    import('./features/ventes/ventes-routing-module')
-      .then(m => m.VentesRoutingModule),
-  canActivate: [authGuard]
-},
+      {
+        path: 'ventes',
+        loadChildren: () =>
+          import('./features/ventes/ventes-routing-module')
+            .then(m => m.VentesRoutingModule),
+        canActivate: [authGuard]
+      },
 
-{
-  path: 'comptabilite',
-  canActivate: [authGuard],
-  loadChildren: () =>
-    import('./features/comptabilite/comptabilite-routing-module')
-      .then(m => m.ComptabiliteRoutingModule)
-},
+      {
+        path: 'comptabilite',
+        canActivate: [authGuard],
+        loadChildren: () =>
+          import('./features/comptabilite/comptabilite-routing-module')
+            .then(m => m.ComptabiliteRoutingModule)
+      },
 
-      // ── Rapports (admin uniquement) ───────────────────────────────────────
       {
         path:        'rapports',
         component:   RapportSelector,
@@ -63,7 +61,6 @@ export const routes: Routes = [
         data:        { roles: ['ADMIN'] }
       },
 
-      // ── Stock / Mouvements (admin uniquement) ─────────────────────────────
       {
         path:          'stock',
         canActivate:   [roleGuard],
@@ -73,7 +70,6 @@ export const routes: Routes = [
             .then(m => m.MouvementListComponent)
       },
 
-      // ── Fournisseurs (admin uniquement) ───────────────────────────────────
       {
         path:          'fournisseurs',
         canActivate:   [roleGuard],
@@ -83,7 +79,6 @@ export const routes: Routes = [
             .then(m => m.FournisseurListComponent)
       },
 
-      // ── Commandes fournisseurs (admin uniquement) ─────────────────────────
       {
         path:        'commandes',
         canActivate: [roleGuard],
@@ -116,7 +111,6 @@ export const routes: Routes = [
         ]
       },
 
-      // ── Utilisateurs (admin uniquement) ───────────────────────────────────
       {
         path:          'utilisateurs',
         canActivate:   [roleGuard],
@@ -125,19 +119,9 @@ export const routes: Routes = [
           import('./features/utilisateurs/components/liste-utilisateurs/liste-utilisateurs')
             .then(m => m.ListeUtilisateursComponent)
       },
-
-      // ── Réservations (admin + vendeur) ────────────────────────────────────
-      // {
-      //   path:          'reservations',
-      //   loadComponent: () =>
-      //     import('./features/reservations/components/liste-reservations/liste-reservations')
-      //       .then(m => m.ListeReservationsComponent)
-      // },
-
     ]
   },
 
-  // Catch-all global → login (PAS de redirection vers dashboard pour éviter la boucle)
-  // { path: '**', redirectTo: 'login' }
-
+  // Catch-all → login (optionnel, mais utile)
+  { path: '**', redirectTo: 'login' }
 ];
