@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -14,6 +14,8 @@ import { VenteResponse, StatutVente } from '../../models/vente.model';
   styleUrls: ['./vente-list.css']
 })
 export class VenteListComponent implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
+
   ventes: VenteResponse[] = [];
   loading = false;
 
@@ -67,7 +69,7 @@ export class VenteListComponent implements OnInit {
       request$ = this.venteService.getMesVentes(this.currentPage, this.pageSize);
     }
 
-    request$.pipe(takeUntilDestroyed()).subscribe({
+    request$.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response) => {
         this.ventes = response.data.content;
         this.totalElements = response.data.totalElements;

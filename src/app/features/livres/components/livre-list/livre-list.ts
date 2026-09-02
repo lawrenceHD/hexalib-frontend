@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -20,6 +20,7 @@ import { LivreImportComponent } from '../livre-import/livre-import';
   styleUrl: './livre-list.css'
 })
 export class LivreListComponent implements OnInit {
+  private readonly destroyRef = inject(DestroyRef);
   livres: Livre[] = [];
   categories: Categorie[] = [];
   langues: string[] = [];
@@ -94,7 +95,7 @@ export class LivreListComponent implements OnInit {
       this.selectedCategorieId,
       this.selectedStatut,
       this.selectedLangue
-    ).pipe(takeUntilDestroyed()).subscribe({
+    ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response) => {
         if (response.success) {
           this.livres = response.data.content;
@@ -111,7 +112,7 @@ export class LivreListComponent implements OnInit {
   }
 
   loadCategoriesActives(): void {
-    this.categorieService.getAllCategoriesActives().pipe(takeUntilDestroyed()).subscribe({
+    this.categorieService.getAllCategoriesActives().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response) => {
         if (response.success) {
           this.categories = response.data;
@@ -124,7 +125,7 @@ export class LivreListComponent implements OnInit {
   }
 
   loadLangues(): void {
-    this.livreService.getAllLangues().pipe(takeUntilDestroyed()).subscribe({
+    this.livreService.getAllLangues().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response) => {
         if (response.success) {
           this.langues = response.data;
@@ -220,7 +221,7 @@ export class LivreListComponent implements OnInit {
 
   createLivre(): void {
     this.loading = true;
-    this.livreService.createLivre(this.formData).pipe(takeUntilDestroyed()).subscribe({
+    this.livreService.createLivre(this.formData).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response) => {
         if (response.success) {
           this.toastr.success('Livre créé avec succès', 'Succès');
@@ -240,7 +241,7 @@ export class LivreListComponent implements OnInit {
     if (!this.selectedLivre) return;
 
     this.loading = true;
-    this.livreService.updateLivre(this.selectedLivre.id, this.formData).pipe(takeUntilDestroyed()).subscribe({
+    this.livreService.updateLivre(this.selectedLivre.id, this.formData).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response) => {
         if (response.success) {
           this.toastr.success('Livre modifié avec succès', 'Succès');
@@ -261,7 +262,7 @@ export class LivreListComponent implements OnInit {
       return;
     }
 
-    this.livreService.deleteLivre(livre.id).pipe(takeUntilDestroyed()).subscribe({
+    this.livreService.deleteLivre(livre.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response) => {
         if (response.success) {
           this.toastr.success('Livre supprimé avec succès', 'Succès');
@@ -275,7 +276,7 @@ export class LivreListComponent implements OnInit {
   }
 
   toggleStatut(livre: Livre): void {
-    this.livreService.toggleStatut(livre.id).pipe(takeUntilDestroyed()).subscribe({
+    this.livreService.toggleStatut(livre.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response) => {
         if (response.success) {
           const action = response.data.statut === 'ACTIF' ? 'activé' : 'désactivé';
@@ -315,7 +316,7 @@ export class LivreListComponent implements OnInit {
       this.selectedLivre.id,
       this.stockFormData.quantite,
       this.stockFormData.motif
-    ).pipe(takeUntilDestroyed()).subscribe({
+    ).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response) => {
         if (response.success) {
           this.toastr.success('Stock ajusté avec succès', 'Succès');
@@ -326,7 +327,7 @@ export class LivreListComponent implements OnInit {
       error: (error) => {
         this.toastr.error(error.message || 'Erreur', 'Erreur');
       }
-    );
+    });
   }
 
   getStatutStockClass(livre: Livre): string {
@@ -366,10 +367,6 @@ export class LivreListComponent implements OnInit {
   importFile: File | null = null;
   importLoading = false;
 
-  // Modal résultat import
-  showImportResultModal = false;
-  importResult: ImportResultResponse | null = null;
-
   openImportModal(): void {
     this.importCategorieId = '';
     this.importFile = null;
@@ -408,7 +405,7 @@ export class LivreListComponent implements OnInit {
     }
 
     this.importLoading = true;
-    this.livreService.importLivres(this.importFile, this.importCategorieId).pipe(takeUntilDestroyed()).subscribe({
+    this.livreService.importLivres(this.importFile, this.importCategorieId).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (response) => {
         this.importResult = response.data;
         this.importLoading = false;
@@ -429,7 +426,7 @@ export class LivreListComponent implements OnInit {
   }
 
   exporterLivres(): void {
-    this.livreService.exportLivres().pipe(takeUntilDestroyed()).subscribe({
+    this.livreService.exportLivres().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (blob) => {
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
