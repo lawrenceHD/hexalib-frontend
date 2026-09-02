@@ -4,10 +4,7 @@
   class="lg:hidden fixed top-4 left-4 z-50 p-3 bg-white rounded-md shadow-md hover:shadow-lg transition-shadow"
   aria-label="Ouvrir le menu"
 >
-  <svg class="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path *ngIf="!isMobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-    <path *ngIf="isMobileMenuOpen"  stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-  </svg>
+  <app-icon [name]="isMobileMenuOpen ? 'x' : 'menu'" [size]="22" klass="text-slate-700"></app-icon>
 </button>
 
 <!-- Overlay mobile (cliquable pour fermer) -->
@@ -39,7 +36,7 @@
   </div>
 
   <!-- Profil utilisateur -->
-  <div class="p-4 border-b border-gray-200" style="margin:5px;padding:5px">
+  <div class="p-4 border-b border-gray-200">
     <div class="flex items-center space-x-3">
       <div class="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-semibold text-lg shrink-0">
         {{ (currentUser?.nomComplet || 'U').charAt(0).toUpperCase() }}
@@ -56,7 +53,7 @@
   </div>
 
   <!-- Contenu menu -->
-  <div class="flex-1 overflow-y-auto py-4" style="margin:5px;padding:5px">
+  <div class="flex-1 overflow-y-auto py-4">
     <ul class="flex flex-col space-y-1 px-3">
       <li *ngFor="let item of menuItems">
         <a
@@ -68,9 +65,7 @@
           [class.pointer-events-none]="item.disabled"
           class="flex items-center h-11 px-4 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-indigo-700 border-l-4 border-transparent transition-colors"
         >
-          <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="item.icon" />
-          </svg>
+          <app-icon [name]="item.icon" [size]="18" klass="shrink-0"></app-icon>
           <span
             *ngIf="!(collapsed$ | async)"
             class="ml-3 text-sm font-medium truncate"
@@ -93,10 +88,7 @@
         (click)="logout()"
         class="flex items-center w-full h-11 px-4 rounded-lg hover:bg-gray-100 text-gray-700 hover:text-red-700 transition-colors"
       >
-        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-        </svg>
+        <app-icon name="log-out" [size]="18" klass="shrink-0"></app-icon>
         <span *ngIf="!(collapsed$ | async)" class="ml-3 text-sm font-medium">
           Déconnexion
         </span>

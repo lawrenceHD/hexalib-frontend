@@ -1,6 +1,6 @@
 <!-- src/app/features/livres/components/livre-list/livre-list.component.html -->
 
-<div class="p-4 sm:p-6 lg:p-8 min-h-screen bg-gray-50 antialiased" style="margin:5px;padding:5px">
+<div class="p-4 sm:p-6 lg:p-8 min-h-screen bg-gray-50 antialiased">
   <!-- En-tête -->
   <div class="mb-8">
     <h1 class="text-3xl font-bold text-gray-900">Gestion des Livres</h1>
@@ -8,61 +8,46 @@
   </div>
 
   <!-- Barre de Recherche + Filtres + Bouton Ajouter -->
-  <div class="mb-6 space-y-4" style="margin:5px;padding:5px">
+  <div class="mb-6 space-y-4">
     <!-- Ligne 1: Recherche + Bouton -->
     <div class="flex flex-col sm:flex-row gap-4 items-stretch sm:items-center">
       <div class="flex-1 max-w-lg">
         <div class="relative">
-          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none" style="margin:5px;padding:5px">
-            <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-            </svg>
+          <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+            <app-icon name="search" [size]="18" klass="text-slate-400"></app-icon>
           </div>
           <input
-            type="text" style="margin:5px;padding:5px"
+            type="text"
             [(ngModel)]="searchTerm"
             (keyup.enter)="onSearch()"
-            placeholder="        Rechercher par titre, auteur, code, ISBN..."
-            class="block w-full pl-11 pr-4 py-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white"
+            placeholder="Rechercher par titre, auteur, code, ISBN..."
+            class="block w-full pl-11 pr-4 py-3 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 bg-white text-sm"
           />
         </div>
       </div>
 
-      <button 
-      style="padding: 0.75rem 1rem; "
+      <button
         *ngIf="authService.isAdmin()"
         (click)="openCreateModal()"
-        class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-medium rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg"
+        class="inline-flex items-center gap-2 px-5 py-3 bg-brand-600 text-white font-medium rounded-xl hover:bg-brand-700 transition-all shadow-sm"
       >
-        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-        </svg>
+        <app-icon name="plus" [size]="18"></app-icon>
         Nouveau Livre
       </button>
 
     <!-- Bouton -->
 <button (click)="showImport = true"
-style="padding: 0.75rem 1rem;"
-  class="inline-flex items-center gap-2 px-4 py-2 bg-green-600
-         hover:bg-green-700 text-white rounded-lg text-sm font-medium">
-         <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
-        </svg>
+  class="inline-flex items-center gap-2 px-4 py-3 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-sm font-medium shadow-sm">
+  <app-icon name="upload" [size]="18"></app-icon>
   Importer Excel
 </button>
  
-<!-- Bouton Exporter -->
 <button
   *ngIf="authService.isAdmin()"
   (click)="exporterLivres()"
-  style="padding: 0.75rem 1rem;"
-  class="inline-flex items-center px-5 py-3 bg-orange-500 hover:bg-orange-600 text-white font-medium rounded-lg transition-all shadow-md hover:shadow-lg"
+  class="inline-flex items-center gap-2 px-5 py-3 bg-amber-600 hover:bg-amber-700 text-white font-medium rounded-xl transition-all shadow-sm"
 >
-  <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-      d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
-  </svg>
+  <app-icon name="download" [size]="18"></app-icon>
   Exporter
 </button>
     </div>
@@ -110,13 +95,20 @@ style="padding: 0.75rem 1rem;"
     </div>
   </div>
 
-  <!-- Loader -->
-  <div *ngIf="loading" class="flex justify-center items-center py-32">
-    <div class="animate-spin rounded-full h-16 w-16 border-4 border-gray-200 border-t-indigo-600"></div>
+  <!-- Loader skeleton -->
+  <div *ngIf="loading" class="space-y-3">
+    <div *ngFor="let i of [1,2,3,4,5]" class="bg-white rounded-2xl border border-slate-200 p-4 flex gap-4">
+      <app-skeleton width="48px" height="48px" rounded="xl"></app-skeleton>
+      <div class="flex-1 space-y-2">
+        <app-skeleton width="40%" height="14px"></app-skeleton>
+        <app-skeleton width="60%" height="12px"></app-skeleton>
+      </div>
+      <app-skeleton width="80px" height="24px" rounded="full"></app-skeleton>
+    </div>
   </div>
 
   <!-- Tableau -->
-  <div *ngIf="!loading" class="bg-white rounded-lg shadow-sm overflow-hidden" style="margin:5px;padding:5px">
+  <div *ngIf="!loading" class="bg-white rounded-lg shadow-sm overflow-hidden">
     <div class="overflow-x-auto">
       <table class="w-full min-w-max table-auto">
         <thead class="border-b border-gray-100">
@@ -201,52 +193,21 @@ style="padding: 0.75rem 1rem;"
               </div>
             </td>
             <td *ngIf="authService.isAdmin()" class="px-6 py-5 text-right">
-              <div class="flex justify-end items-center gap-2">
-                <!-- Ajuster Stock -->
-                <button
-                  (click)="openStockModal(livre)"
-                  class="p-2.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                  title="Ajuster le stock"
-                >
-                  <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-                  </svg>
+              <div class="flex justify-end items-center gap-1">
+                <button (click)="openStockModal(livre)" class="h-9 w-9 inline-flex items-center justify-center text-brand-600 hover:bg-brand-50 rounded-xl transition-colors" title="Ajuster le stock">
+                  <app-icon name="warehouse" [size]="18"></app-icon>
                 </button>
-
-                <!-- Éditer -->
-                <button
-                  (click)="openEditModal(livre)"
-                  class="p-2.5 text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
-                  title="Modifier"
-                >
-                  <svg class="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
-<path d="M13.586 3.586a2 2 0 112.828 2.828l-.793.793-2.828-2.828.793-.793zM11.379 5.793L3 14.172V17h2.828l8.38-8.379-2.83-2.828z"/>
-</svg>
-</button>
-<!-- Toggle Statut -->
-            <button
-              (click)="toggleStatut(livre)"
-              [title]="livre.statut === 'ACTIF' ? 'Désactiver' : 'Activer'"
-              class="p-2.5 rounded-lg transition-colors"
-              [class.hover:bg-orange-100]="livre.statut === 'ACTIF'"
-              [class.hover:bg-green-100]="livre.statut !== 'ACTIF'"
-            >
-              <svg class="h-5 w-5" [class.text-orange-600]="livre.statut === 'ACTIF'" [class.text-green-600]="livre.statut !== 'ACTIF'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path *ngIf="livre.statut === 'ACTIF'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
-                <path *ngIf="livre.statut !== 'ACTIF'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/>
-              </svg>
-            </button>
-            <!-- Supprimer -->
-            <button
-              (click)="deleteLivre(livre)"
-              class="p-2.5 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-              title="Supprimer"
-            >
-              <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-              </svg>
-            </button>
-          </div>
+                <button (click)="openEditModal(livre)" class="h-9 w-9 inline-flex items-center justify-center text-slate-600 hover:bg-slate-100 rounded-xl transition-colors" title="Modifier">
+                  <app-icon name="pencil" [size]="18"></app-icon>
+                </button>
+                <button (click)="toggleStatut(livre)" [title]="livre.statut === 'ACTIF' ? 'Désactiver' : 'Activer'" class="h-9 w-9 inline-flex items-center justify-center rounded-xl transition-colors"
+                  [class.text-amber-600]="livre.statut === 'ACTIF'" [class.hover:bg-amber-50]="livre.statut === 'ACTIF'" [class.text-emerald-600]="livre.statut !== 'ACTIF'" [class.hover:bg-emerald-50]="livre.statut !== 'ACTIF'">
+                  <app-icon [name]="livre.statut === 'ACTIF' ? 'power' : 'power'" [size]="18"></app-icon>
+                </button>
+                <button (click)="deleteLivre(livre)" class="h-9 w-9 inline-flex items-center justify-center text-red-600 hover:bg-red-50 rounded-xl transition-colors" title="Supprimer">
+                  <app-icon name="trash" [size]="18"></app-icon>
+                </button>
+              </div>
         </td>
       </tr>
       <!-- Ligne vide -->
@@ -605,13 +566,11 @@ style="padding: 0.75rem 1rem;"
 
 <!-- Modale -->
 <div *ngIf="showImport"
-style="margin:5px;padding:5px"
      class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
      (click)="showImport = false">
   <div class="bg-white rounded-2xl shadow-xl w-full max-w-xl"
-  style="margin:5px;padding:5px"
        (click)="$event.stopPropagation()">
-    <div class="flex justify-between items-center px-6 py-4 border-b" style="margin:5px;padding:5px">
+    <div class="flex justify-between items-center px-6 py-4 border-b">
 
       <h2 class="text-lg font-semibold text-gray-800">Importer des livres</h2>
       <button (click)="showImport = false"

@@ -11,11 +11,15 @@ import { Categorie } from '../../../../core/models/categorie.model';
 import { AuthService } from '../../../../core/services/auth';
 import { ImportResultResponse } from '../../models/livre.model';
 import { LivreImportComponent } from '../livre-import/livre-import';
+import { IconComponent } from '../../../../shared/ui/icon/icon';
+import { BadgeComponent } from '../../../../shared/ui/badge/badge';
+import { CardComponent } from '../../../../shared/ui/card/card';
+import { SkeletonComponent } from '../../../../shared/ui/skeleton/skeleton';
 
 @Component({
   selector: 'app-livre-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, LivreImportComponent],
+  imports: [CommonModule, FormsModule, LivreImportComponent, IconComponent, BadgeComponent, CardComponent, SkeletonComponent],
   templateUrl: './livre-list.html',
   styleUrl: './livre-list.css'
 })

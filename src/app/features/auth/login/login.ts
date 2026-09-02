@@ -6,13 +6,13 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router }              from '@angular/router';
 import { ToastrService }       from 'ngx-toastr';
 import { AuthService }         from '../../../core/services/auth';
+import { IconComponent }       from '../../../shared/ui/icon/icon';
 
 @Component({
   selector:    'app-login',
   standalone:  true,
-  imports:     [CommonModule, ReactiveFormsModule],
+  imports:     [CommonModule, ReactiveFormsModule, IconComponent],
   templateUrl: './login.html',
-  styleUrl:    './login.scss'
 })
 export class LoginComponent implements OnInit {
   loginForm:    FormGroup;
