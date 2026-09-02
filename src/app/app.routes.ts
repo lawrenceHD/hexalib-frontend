@@ -1,21 +1,19 @@
 // src/app/app.routes.ts
 
 import { Routes } from '@angular/router';
-import { provideRouter } from '@angular/router';   // ← Ajoute cette importation si elle n'est pas là
 
-import { LoginComponent }         from './features/auth/login/login';
-import { MainLayoutComponent }    from './shared/layouts/main-layout/main-layout';
-import { CategorieListComponent } from './features/categories/components/categorie-list/categorie-list';
-import { LivreListComponent }     from './features/livres/components/livre-list/livre-list';
-import { ReductionListComponent } from './features/reductions/components/reduction-list/reduction-list';
-import { RapportSelector }        from './features/rapports/components/rapport-selector/rapport-selector';
-import { authGuard }              from './core/guards/auth.guard';
-import { roleGuard }              from './core/guards/role-guard';
+import { MainLayoutComponent } from './shared/layouts/main-layout/main-layout';
+import { authGuard }           from './core/guards/auth.guard';
+import { roleGuard }           from './core/guards/role.guard';
 
 export const routes: Routes = [
 
   // ── Public 
-  { path: 'login', component: LoginComponent },
+  {
+    path: 'login',
+    loadComponent: () =>
+      import('./features/auth/login/login').then(m => m.LoginComponent)
+  },
 
   // ── Authentifié 
   {
@@ -34,31 +32,48 @@ export const routes: Routes = [
             .then(m => m.DashboardComponent)
       },
 
-      { path: 'livres',     component: LivreListComponent },
-      { path: 'categories', component: CategorieListComponent },
-      { path: 'reductions', component: ReductionListComponent },
+      {
+        path:          'livres',
+        loadComponent: () =>
+          import('./features/livres/components/livre-list/livre-list')
+            .then(m => m.LivreListComponent)
+      },
+      {
+        path:          'categories',
+        loadComponent: () =>
+          import('./features/categories/components/categorie-list/categorie-list')
+            .then(m => m.CategorieListComponent)
+      },
+      {
+        path:          'reductions',
+        loadComponent: () =>
+          import('./features/reductions/components/reduction-list/reduction-list')
+            .then(m => m.ReductionListComponent)
+      },
 
       {
         path: 'ventes',
         loadChildren: () =>
-          import('./features/ventes/ventes-routing-module')
-            .then(m => m.VentesRoutingModule),
-        canActivate: [authGuard]
+          import('./features/ventes/ventes.routes')
+            .then(m => m.VENTES_ROUTES)
       },
 
       {
-        path: 'comptabilite',
-        canActivate: [authGuard],
-        loadChildren: () =>
-          import('./features/comptabilite/comptabilite-routing-module')
-            .then(m => m.ComptabiliteRoutingModule)
-      },
-
-      {
-        path:        'rapports',
-        component:   RapportSelector,
+        path:        'comptabilite',
         canActivate: [roleGuard],
-        data:        { roles: ['ADMIN'] }
+        data:        { roles: ['ADMIN'] },
+        loadChildren: () =>
+          import('./features/comptabilite/comptabilite.routes')
+            .then(m => m.COMPTABILITE_ROUTES)
+      },
+
+      {
+        path:          'rapports',
+        canActivate:   [roleGuard],
+        data:          { roles: ['ADMIN'] },
+        loadComponent: () =>
+          import('./features/rapports/components/rapport-selector/rapport-selector')
+            .then(m => m.RapportSelector)
       },
 
       {

@@ -2,8 +2,11 @@
 
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth';
+import { User } from '../../../core/models/user.model';
+import { environment } from '../../../../environments/environment';
 
 interface DashboardVendeur {
   mesVentesJour:             number;
@@ -54,7 +57,7 @@ export class VendeurDashboardComponent implements OnInit {
     this.errorMsg = '';
 
     this.http.get<any>(`${this.apiUrl}/dashboard/vendeur`).subscribe({
-      next: (res) => {
+      next: (res: any) => {
         if (res.success && res.data) {
           this.dashboard = res.data;
         } else {
@@ -63,7 +66,7 @@ export class VendeurDashboardComponent implements OnInit {
         }
         this.loading = false;
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('[VendeurDashboard] Erreur chargement:', err);
         // Ne pas bloquer l'UI — afficher un dashboard vide avec message
         this.dashboard = this.emptyDashboard();
