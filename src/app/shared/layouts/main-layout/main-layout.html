@@ -1,11 +1,8 @@
-<div class="flex h-screen bg-gray-50 overflow-hidden">
-  <!-- Sidebar -->
+<div class="flex h-screen bg-slate-50 overflow-hidden">
   <app-sidebar></app-sidebar>
-
-  <!-- Main Content -->
   <div class="flex-1 flex flex-col overflow-hidden">
-    <!-- Content Area -->
-    <main class="flex-1 overflow-y-auto scrollbar-thin">
+    <app-topbar></app-topbar>
+    <main class="flex-1 overflow-y-auto scrollbar-thin bg-slate-50">
       <router-outlet></router-outlet>
     </main>
   </div>

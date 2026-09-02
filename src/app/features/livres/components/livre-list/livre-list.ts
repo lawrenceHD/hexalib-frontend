@@ -1,4 +1,4 @@
-import { Component, OnInit, inject, DestroyRef } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef, ChangeDetectionStrategy, ChangeDetectorRef } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -21,10 +21,12 @@ import { SkeletonComponent } from '../../../../shared/ui/skeleton/skeleton';
   standalone: true,
   imports: [CommonModule, FormsModule, LivreImportComponent, IconComponent, BadgeComponent, CardComponent, SkeletonComponent],
   templateUrl: './livre-list.html',
-  styleUrl: './livre-list.css'
+  styleUrl: './livre-list.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class LivreListComponent implements OnInit {
   private readonly destroyRef = inject(DestroyRef);
+  private readonly cdr = inject(ChangeDetectorRef);
   livres: Livre[] = [];
   categories: Categorie[] = [];
   langues: string[] = [];
@@ -107,10 +109,12 @@ export class LivreListComponent implements OnInit {
           this.totalPages = response.data.totalPages;
         }
         this.loading = false;
+        this.cdr.markForCheck();
       },
       error: (error) => {
         this.toastr.error(error.message || 'Erreur lors du chargement', 'Erreur');
         this.loading = false;
+        this.cdr.markForCheck();
       }
     });
   }
@@ -120,6 +124,7 @@ export class LivreListComponent implements OnInit {
       next: (response) => {
         if (response.success) {
           this.categories = response.data;
+          this.cdr.markForCheck();
         }
       },
       error: (error) => {
@@ -133,6 +138,7 @@ export class LivreListComponent implements OnInit {
       next: (response) => {
         if (response.success) {
           this.langues = response.data;
+          this.cdr.markForCheck();
         }
       },
       error: (error) => {
@@ -233,10 +239,12 @@ export class LivreListComponent implements OnInit {
           this.loadLivres();
         }
         this.loading = false;
+        this.cdr.markForCheck();
       },
       error: (error) => {
         this.toastr.error(error.message || 'Erreur lors de la création', 'Erreur');
         this.loading = false;
+        this.cdr.markForCheck();
       }
     });
   }
@@ -253,10 +261,12 @@ export class LivreListComponent implements OnInit {
           this.loadLivres();
         }
         this.loading = false;
+        this.cdr.markForCheck();
       },
       error: (error) => {
         this.toastr.error(error.message || 'Erreur lors de la modification', 'Erreur');
         this.loading = false;
+        this.cdr.markForCheck();
       }
     });
   }
@@ -364,6 +374,12 @@ export class LivreListComponent implements OnInit {
   get pages(): number[] {
     return Array(this.totalPages).fill(0).map((x, i) => i);
   }
+
+  trackByLivre(_: number, livre: Livre): string { return livre.id; }
+  trackByCategorie(_: number, c: Categorie): string { return c.id; }
+  toggleFiltersDrawer(): void { this.showFiltersDrawer = !this.showFiltersDrawer; }
+
+  showFiltersDrawer = false;
 
   // Modal import
   showImportModal = false;

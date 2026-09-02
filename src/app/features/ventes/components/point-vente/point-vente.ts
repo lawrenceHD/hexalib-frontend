@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, inject, ChangeDetectorRef } from '@angular/core';
 import { VenteService } from '../../services/vente';
 import { LivreService } from '../../../livres/services/livre';
 import { ReductionService } from '../../../reductions/services/reduction';
@@ -7,14 +7,18 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ToastrService } from 'ngx-toastr';
+import { IconComponent } from '../../../../shared/ui/icon/icon';
 
 @Component({
   selector: 'app-point-vente',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, IconComponent],
   templateUrl: './point-vente.html',
-  styleUrls: ['./point-vente.css']
+  styleUrls: ['./point-vente.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PointVenteComponent implements OnInit {
+  private readonly cdr = inject(ChangeDetectorRef);
+  showCartMobile = false;
   // Recherche de livres
   searchTerm = '';
   livresDisponibles: any[] = [];
@@ -43,6 +47,10 @@ export class PointVenteComponent implements OnInit {
     private toastr: ToastrService
   ) {}
 
+  trackByLivre(_: number, l: any): string { return l.id; }
+  trackByPanier(_: number, l: LignePanier): string { return l.livre.id; }
+  toggleCartMobile(): void { this.showCartMobile = !this.showCartMobile; this.cdr.markForCheck(); }
+
   ngOnInit(): void {
     this.loadLivresDisponibles();
     this.loadReductionsActives();
@@ -65,10 +73,12 @@ export class PointVenteComponent implements OnInit {
       next: (response) => {
         this.livresDisponibles = response.data.content.filter((l: any) => l.quantiteStock > 0);
         this.loadingLivres = false;
+        this.cdr.markForCheck();
       },
       error: () => {
         this.toastr.error('Erreur lors du chargement des livres', 'Erreur');
         this.loadingLivres = false;
+        this.cdr.markForCheck();
       }
     });
   }
@@ -236,6 +246,7 @@ export class PointVenteComponent implements OnInit {
     this.totalHT = this.panier.reduce((sum, l) => sum + l.prixUnitaire * l.quantite, 0);
     this.totalReductions = this.panier.reduce((sum, l) => sum + l.montantReduction, 0);
     this.totalTTC = this.totalHT - this.totalReductions;
+    this.cdr.markForCheck();
   }
 
   /**
